@@ -1,0 +1,153 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "ERPMasterContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "IrregularWords": null,
+   "MinimumProductVersion": "2.6.1248",
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Models",
+   "PluralRules": null,
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "Master.Entities",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "SingularRules": null,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "erpmaster.__ef_migrations_history",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.auth_login_challenges",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.auth_refresh_tokens",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.currency",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.db_instance",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.erp_countries",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.erp_tenants",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.erp_user_tenants",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.erp_users",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.ged_directory",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.master_admin_users",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.master_erp_database_ref",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.master_erp_global_configs",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.master_erp_industries",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.master_erp_industries_client",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.master_erp_mail_templates",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.master_erp_module_client",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.master_erp_modules",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.master_erp_user",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.ref_id_map",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.ref_init_config",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.ref_init_config_raw",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.register_auth_codes",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.register_completion_tokens",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.tenant_agency_profile",
+         "ObjectType": 0
+      },
+      {
+         "Name": "erpmaster.tenant_init_jobs",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false,
+   "UseT4Split": false
+}

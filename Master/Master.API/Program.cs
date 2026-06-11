@@ -1,6 +1,7 @@
 using Master.Auth;
 using Master.DIContainerCore;
 using Master.Infrastructure.MappingProfiles;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;

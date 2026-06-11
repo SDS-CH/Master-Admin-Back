@@ -32,7 +32,7 @@ builder.Services.AddAuthorization();
 var connectionString = builder.Configuration.GetConnectionString("DmsReference");
 ContainerExtension.Initialize(builder.Services, connectionString!);
 
-builder.Services.AddAutoMapper(typeof(DepartmentProfile).Assembly);
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DepartmentProfile)));
 
 builder.Services.AddKendo();
 

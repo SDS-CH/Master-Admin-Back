@@ -39,7 +39,7 @@ ContainerExtension.Initialize(builder.Services, connectionString!);
 builder.Services.AddTransient<IAdminAuthService, AdminAuthService>();
 
 // AutoMapper - scan the Infrastructure assembly for all profiles
-builder.Services.AddAutoMapper(typeof(ErpTenantProfile).Assembly);
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(ErpTenantProfile)));
 
 // Kendo
 builder.Services.AddKendo();

@@ -17,7 +17,7 @@ namespace DMS.EFCore.Repositories
 
         public async Task<DataSourceResult> GetAllDepartments(DataSourceRequest requestModel)
         {
-            return await dbContext.Department.ToDataSourceResultAsync(requestModel);
+            return await dbContext.Departments.ToDataSourceResultAsync(requestModel);
         }
     }
 }

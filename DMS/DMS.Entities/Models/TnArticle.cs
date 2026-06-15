@@ -50,4 +50,24 @@ public partial class TnArticle
     public Guid TenantId { get; set; }
 
     public int? IndustryId { get; set; }
+
+    public virtual TnCategoriesReference CategorieReferenceNavigation { get; set; }
+
+    public virtual TnCentresCout CentreCoutNavigation { get; set; }
+
+    public virtual ProductServiceCategry GroupeArticleNavigation { get; set; }
+
+    public virtual PcCompteComptable PcCompteComptable { get; set; }
+
+    public virtual PcCompteComptable PcCompteComptableNavigation { get; set; }
+
+    public virtual TnRubriquesCotation SalesCategoryNavigation { get; set; }
+
+    public virtual ICollection<TnDetailsPiece> TnDetailsPieces { get; set; } = new List<TnDetailsPiece>();
+
+    public virtual ICollection<TnDetailsStock> TnDetailsStocks { get; set; } = new List<TnDetailsStock>();
+
+    public virtual ICollection<TnRubriquesAchat> TnRubriquesAchats { get; set; } = new List<TnRubriquesAchat>();
+
+    public virtual InvProductVariant VariantProduct { get; set; }
 }

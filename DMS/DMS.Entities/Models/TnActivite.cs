@@ -24,4 +24,12 @@ public partial class TnActivite
     public Guid TenantId { get; set; }
 
     public int? IndustryId { get; set; }
+
+    public virtual TnModulesOperation ModuleOperationNavigation { get; set; }
+
+    public virtual ICollection<TnEstimationsDossier> TnEstimationsDossiers { get; set; } = new List<TnEstimationsDossier>();
+
+    public virtual ICollection<TnModelesCotation> TnModelesCotations { get; set; } = new List<TnModelesCotation>();
+
+    public virtual ICollection<TnTypesDossier> TnTypesDossiers { get; set; } = new List<TnTypesDossier>();
 }

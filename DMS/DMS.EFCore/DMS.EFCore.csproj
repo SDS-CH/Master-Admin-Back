@@ -11,5 +11,6 @@
     <ProjectReference Include="..\..\Master\Master.Common\Master.Common.csproj" />
     <ProjectReference Include="..\DMS.Infrastructure\DMS.Infrastructure.csproj" />
     <ProjectReference Include="..\DMS.Entities\DMS.Entities.csproj" />
+    <ProjectReference Include="..\DMS.DTO\DMS.DTO.csproj" />
   </ItemGroup>
 </Project>

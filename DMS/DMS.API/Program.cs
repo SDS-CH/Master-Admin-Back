@@ -6,6 +6,12 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using AutoMapper;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using DMS.Entities.Models;
+using DMS.EFCore.Repositories;
+using DMS.EFCore;
+using DMS.Infrastructure.IRepositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,8 +35,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-var connectionString = builder.Configuration.GetConnectionString("DmsReference");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 ContainerExtension.Initialize(builder.Services, connectionString!);
+
+// Enregistrement du DbContext et du repository d'activité
+builder.Services.AddDbContext<postgresContext>(options =>
+    options.UseNpgsql(connectionString));
+
+
+builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DepartmentProfile)));
 
@@ -97,3 +110,16 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+// ── Un seul DbContext ──────────────────────────────────────────
+builder.Services.AddDbContext<postgresContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// ── Repositories ───────────────────────────────────────────────
+builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
+
+// Supprime complètement AppDbContext — plus besoin
+builder.Services.AddDbContext<postgresContext>(options =>
+    options.UseNpgsql(connectionString, npgsql =>
+        npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "erpmaster"))
+);

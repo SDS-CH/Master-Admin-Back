@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.7.11903.348
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Master.Common", "Master\Master.Common\Master.Common.csproj", "{62471F2A-AA82-449C-9964-2616EAA0EC7A}"
 EndProject
@@ -40,6 +40,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DMS", "DMS", "{916FC042-C497-44C9-B90B-36DEE8136FB8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Master", "Master", "{A672AE28-98A5-4EEE-9D23-1DD962D09826}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{6D4583CD-FE15-4296-A10F-3D8BF800026C}"
+	ProjectSection(SolutionItems) = preProject
+		DMS\DMS.Entities\Models\DmsReferenceContext.cs = DMS\DMS.Entities\Models\DmsReferenceContext.cs
+		DMS\DMS.Entities\Models\postgresContext.cs = DMS\DMS.Entities\Models\postgresContext.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -137,5 +143,9 @@ Global
 		{F582BD9C-DF67-4F7B-A414-6C619F3B021E} = {916FC042-C497-44C9-B90B-36DEE8136FB8}
 		{47E2D6EB-9C48-490D-9BCB-F5B40961ADE3} = {916FC042-C497-44C9-B90B-36DEE8136FB8}
 		{70C57FFC-7119-4D3D-B2D7-B14BAF032BD5} = {916FC042-C497-44C9-B90B-36DEE8136FB8}
+		{6D4583CD-FE15-4296-A10F-3D8BF800026C} = {916FC042-C497-44C9-B90B-36DEE8136FB8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A7B75CF0-BD90-4B52-AF3F-1CEBD01DFC51}
 	EndGlobalSection
 EndGlobal

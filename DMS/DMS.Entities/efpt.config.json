@@ -4,18 +4,14 @@
    "ContextNamespace": null,
    "FilterSchemas": false,
    "IncludeConnectionString": false,
-   "IrregularWords": null,
-   "MinimumProductVersion": "2.6.1248",
    "ModelNamespace": null,
    "OutputContextPath": null,
    "OutputPath": "Models",
-   "PluralRules": null,
    "PreserveCasingWithRegex": true,
    "ProjectRootNamespace": "DMS.Entities",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 0,
-   "SingularRules": null,
    "T4TemplatePath": null,
    "Tables": [
       {
@@ -1399,10 +1395,6 @@
          "ObjectType": 0
       },
       {
-         "Name": "dms_reference.tn_Codes_Taxes",
-         "ObjectType": 0
-      },
-      {
          "Name": "dms_reference.tn_Codes_Validites",
          "ObjectType": 0
       },
@@ -2348,6 +2340,14 @@
       },
       {
          "Name": "dms_reference.traduction",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dms_reference.translation_data",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dms_reference.translation_field",
          "ObjectType": 0
       },
       {

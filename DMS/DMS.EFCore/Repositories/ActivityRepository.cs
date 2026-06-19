@@ -7,9 +7,9 @@ namespace DMS.EFCore.Repositories
 {
     public class ActivityRepository : IActivityRepository
     {
-        private readonly postgresContext _context;  // ← postgresContext pas DmsDbContex
+        private readonly DmsReferenceContext _context;  // ← postgresContext pas DmsDbContex
 
-        public ActivityRepository(postgresContext context)  // ← context pas _context
+        public ActivityRepository(DmsReferenceContext context)  // ← context pas _context
         {
             _context = context;  // ← _context = context
         }

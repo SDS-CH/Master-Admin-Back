@@ -703,8 +703,6 @@ public partial class DmsReferenceContext : DbContext
 
     public virtual DbSet<TnCodesRegime> TnCodesRegimes { get; set; }
 
-    public virtual DbSet<TnCodesTaxis> TnCodesTaxes { get; set; }
-
     public virtual DbSet<TnCodesValidite> TnCodesValidites { get; set; }
 
     public virtual DbSet<TnColisagesDossier> TnColisagesDossiers { get; set; }
@@ -1178,6 +1176,10 @@ public partial class DmsReferenceContext : DbContext
     public virtual DbSet<TotalSum> TotalSums { get; set; }
 
     public virtual DbSet<Traduction> Traductions { get; set; }
+
+    public virtual DbSet<TranslationDatum> TranslationData { get; set; }
+
+    public virtual DbSet<TranslationField> TranslationFields { get; set; }
 
     public virtual DbSet<TxDossier> TxDossiers { get; set; }
 
@@ -3797,6 +3799,9 @@ public partial class DmsReferenceContext : DbContext
             entity.Property(e => e.CountryName)
                 .IsRequired()
                 .HasMaxLength(50);
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
             entity.Property(e => e.Nationality).HasMaxLength(200);
         });
 
@@ -4791,6 +4796,7 @@ public partial class DmsReferenceContext : DbContext
             entity.HasIndex(e => new { e.Id, e.TenantId }, "UQ_Function_ID_tenant").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.IsDefault).HasDefaultValue(false);
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(500);
@@ -9288,7 +9294,7 @@ public partial class DmsReferenceContext : DbContext
 
             entity.HasIndex(e => e.SalesCategory, "fki_tn_Articles$rubric_cotation$Code_Rubric_Cotation");
 
-            entity.Property(e => e.CodeArticle).HasColumnName("Code Article");
+            entity.Property(e => e.CodeArticle).HasColumnName("Code Article").ValueGeneratedOnAdd(); 
             entity.Property(e => e.AccountPurchases)
                 .HasMaxLength(15)
                 .HasColumnName("Account Purchases");
@@ -10044,56 +10050,6 @@ public partial class DmsReferenceContext : DbContext
                 .HasForeignKey(d => new { d.TenantId, d.Operation })
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_tn_Codes_Regimes_tn_Rubriques_Operations");
-        });
-
-        modelBuilder.Entity<TnCodesTaxis>(entity =>
-        {
-            entity.HasKey(e => new { e.CodeTaxe, e.TenantId }).HasName("tn_Codes_Taxes_pk");
-
-            entity.ToTable("tn_Codes_Taxes", "dms_reference");
-
-            entity.HasIndex(e => new { e.CodeTaxe, e.TenantId }, "uq_tn_Codes_Taxes_code_taxe_tenant").IsUnique();
-
-            entity.Property(e => e.CodeTaxe)
-                .HasMaxLength(10)
-                .HasColumnName("Code Taxe");
-            entity.Property(e => e.TenantId).HasColumnName("tenant_id");
-            entity.Property(e => e.Abbreviation)
-                .HasMaxLength(200)
-                .HasColumnName("abbreviation");
-            entity.Property(e => e.Agence).HasMaxLength(10);
-            entity.Property(e => e.CodeTisCompta).HasMaxLength(10);
-            entity.Property(e => e.CompteTaxeAchat)
-                .HasMaxLength(15)
-                .HasColumnName("Compte Taxe Achat");
-            entity.Property(e => e.CompteTaxeVente)
-                .HasMaxLength(15)
-                .HasColumnName("Compte Taxe Vente");
-            entity.Property(e => e.CountryId).HasColumnName("countryId");
-            entity.Property(e => e.DescriptionTaxe)
-                .IsRequired()
-                .HasMaxLength(100)
-                .HasColumnName("Description Taxe");
-            entity.Property(e => e.PourcentageTaxe).HasColumnName("Pourcentage Taxe");
-            entity.Property(e => e.Rubrique).HasMaxLength(10);
-            entity.Property(e => e.TextPrefixOnNewLine).HasMaxLength(200);
-            entity.Property(e => e.TvaTaxTopology).HasMaxLength(50);
-            entity.Property(e => e.TypeTax).HasMaxLength(50);
-            entity.Property(e => e.WhTaxTopology).HasMaxLength(50);
-
-            entity.HasOne(d => d.AgenceNavigation).WithMany(p => p.TnCodesTaxes)
-                .HasForeignKey(d => d.Agence)
-                .HasConstraintName("tn_Codes_Taxes$tn_Agencestn_Codes_Taxes$Agence");
-
-            entity.HasOne(d => d.PcCompteComptable).WithMany(p => p.TnCodesTaxisPcCompteComptables)
-                .HasPrincipalKey(p => new { p.Compte, p.TenantId })
-                .HasForeignKey(d => new { d.CompteTaxeAchat, d.TenantId })
-                .HasConstraintName("tn_Codes_Taxes$PC_CompteComptable$Compte_Taxe_Achat");
-
-            entity.HasOne(d => d.PcCompteComptableNavigation).WithMany(p => p.TnCodesTaxisPcCompteComptableNavigations)
-                .HasPrincipalKey(p => new { p.Compte, p.TenantId })
-                .HasForeignKey(d => new { d.CompteTaxeVente, d.TenantId })
-                .HasConstraintName("tn_Codes_Taxes$PC_CompteComptable$Compte_Taxe_Vente");
         });
 
         modelBuilder.Entity<TnCodesValidite>(entity =>
@@ -17135,6 +17091,68 @@ public partial class DmsReferenceContext : DbContext
             entity.Property(e => e.Translation)
                 .HasMaxLength(200)
                 .HasColumnName("translation");
+        });
+
+        modelBuilder.Entity<TranslationDatum>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("translation_data_pkey");
+
+            entity.ToTable("translation_data", "dms_reference", tb => tb.HasComment("Traductions deduplicees : un source_label ne peut avoir qu'une seule traduction par langue."));
+
+            entity.HasIndex(e => e.Language, "ix_translation_data_language");
+
+            entity.HasIndex(e => new { e.SourceLabel, e.Language }, "translation_data_uq").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AddNewTime)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("add_new_time");
+            entity.Property(e => e.Language)
+                .IsRequired()
+                .HasMaxLength(10)
+                .HasComment("Code langue normalise lowercase (fr, en, de, es, pt...).")
+                .HasColumnName("language");
+            entity.Property(e => e.SourceLabel)
+                .IsRequired()
+                .HasMaxLength(500)
+                .HasComment("Valeur originale du champ (texte brut, pas le code PK de la ligne).")
+                .HasColumnName("source_label");
+            entity.Property(e => e.TranslatedLabel)
+                .HasMaxLength(500)
+                .HasComment("Texte traduit. NULL = traduction non encore renseignee.")
+                .HasColumnName("translated_label");
+        });
+
+        modelBuilder.Entity<TranslationField>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("translation_field_pkey");
+
+            entity.ToTable("translation_field", "dms_reference", tb => tb.HasComment("Configuration des champs a traduire : une ligne par (table, champ)."));
+
+            entity.HasIndex(e => e.TableName, "ix_translation_field_table");
+
+            entity.HasIndex(e => new { e.TableName, e.FieldName }, "translation_field_uq").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AddNewTime)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("add_new_time");
+            entity.Property(e => e.FieldName)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasComment("Nom de la colonne dont la valeur doit etre traduite.")
+                .HasColumnName("field_name");
+            entity.Property(e => e.Menu)
+                .HasMaxLength(100)
+                .HasComment("Optionnel : groupement fonctionnel (ex: \"articles\", \"operations\").")
+                .HasColumnName("menu");
+            entity.Property(e => e.TableName)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasComment("Nom de la table contenant le champ (sans schema, schema est le schema tenant).")
+                .HasColumnName("table_name");
         });
 
         modelBuilder.Entity<TxDossier>(entity =>

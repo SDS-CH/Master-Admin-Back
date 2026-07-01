@@ -34,6 +34,11 @@ namespace DMS.DIContainerCore
             
             services.AddTransient<IFileTypeRepository<TnTypesDossier>, FileTypeRepository>();
             services.AddTransient<IFileTypeService<FileTypeDto>, FileTypeService<FileTypeDto, TnTypesDossier, DmsReferenceContext>>();
+
+            // Activity
+            services.AddTransient<IActivityRepository<TnActivite>, ActivityRepository>();
+            services.AddTransient<IActivityService<ActivityDto>,
+                ActivityService<ActivityDto, TnActivite, DmsReferenceContext>>();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace DMS.DTO.DTOs
         public string CodeActivite { get; set; } = string.Empty;
         public string LibelleActivite { get; set; } = string.Empty;
         public string ModuleOperation { get; set; } = string.Empty;
-        public string ConcernFacturation { get; set; } = string.Empty;
+        public string? ConcernFacturation { get; set; }
         public int Session { get; set; }
         public DateTime AddNewTime { get; set; }
         public DateTime EditTime { get; set; }

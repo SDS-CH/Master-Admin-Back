@@ -1,10 +1,16 @@
 using DMS.DIContainerCore;
+using DMS.DTO.DTOs;
+using DMS.EFCore.Repositories;
+using DMS.Entities.Models;
+using DMS.Infrastructure.IRepositories;
+using DMS.Infrastructure.IServices;
 using DMS.Infrastructure.MappingProfiles;
+using DMS.Services.Services;
 using Master.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
-using AutoMapper;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,7 +39,6 @@ var connectionString = builder.Configuration.GetConnectionString("DmsReference")
 ContainerExtension.Initialize(builder.Services, connectionString!);
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DepartmentProfile)));
-
 builder.Services.AddKendo();
 
 builder.Services.AddControllers()
@@ -84,6 +89,15 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DmsReferenceContext>();
+    db.Database.ExecuteSqlRaw("""
+        ALTER TABLE dms_reference."GED_DocumentType"
+        ADD COLUMN IF NOT EXISTS "industryId" integer;
+        """);
+}
 
 if (app.Environment.IsDevelopment())
 {

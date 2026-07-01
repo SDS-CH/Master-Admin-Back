@@ -24,8 +24,7 @@ namespace DMS.DIContainerCore
                 ArticleService<ArticleDto, TnArticle, DmsReferenceContext>>();
 
             // Department
-            services.AddTransient<IDepartmentRepository<Department>, DepartmentRepository>();
-            services.AddTransient<IDepartmentService<DepartmentDTO>,
+            services.AddTransient<IDepartmentRepository<Department>, DepartmentRepository>();            services.AddTransient<IDepartmentService<DepartmentDTO>,
                 DepartmentService<DepartmentDTO, Department, DmsReferenceContext>>();
 
             // Translation 

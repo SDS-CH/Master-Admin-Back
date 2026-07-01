@@ -5,13 +5,9 @@ using System.Collections.Generic;
 
 namespace DMS.Entities.Models;
 
-public partial class TnGroupeClient
+public partial class TnDevisesRef
 {
-    public int Id { get; set; }
+    public string Code { get; set; }
 
-    public string Nom { get; set; }
-
-    public string SiegeSocial { get; set; }
-
-    public Guid TenantId { get; set; }
+    public string Label { get; set; }
 }

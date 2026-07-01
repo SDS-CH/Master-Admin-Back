@@ -14,17 +14,15 @@ namespace DMS.Application.Services
         where TContext : DmsReferenceContext
     {
         private readonly IFileTypeRepository<TFileType> _repository;
-        private readonly IActiviteRepository _activiteRepository;
 
         public FileTypeService(
             TContext dbContext,
             IMapper mapper,
-            IFileTypeRepository<TFileType> repository,
-            IActiviteRepository activiteRepository)
+            IFileTypeRepository<TFileType> repository
+            )
             : base(dbContext, mapper)
         {
             _repository = repository;
-            _activiteRepository = activiteRepository;
         }
 
         // GET BY INDUSTRY
@@ -78,9 +76,9 @@ namespace DMS.Application.Services
                 throw new Exception("Un File Type avec ce libellé existe déjà.");
 
             // Récupérer l'activité pour avoir ModuleOperation
-            var activity = await _activiteRepository.GetByCodeAsync(dto.Activite);
-            if (activity == null)
-                throw new Exception("Activité introuvable.");
+            //var activity = await _activiteRepository.GetByCodeAsync(dto.Activite);
+            //if (activity == null)
+            //    throw new Exception("Activité introuvable.");
 
             // Générer le code (7 chars)
             var code = Guid.NewGuid().ToString().Substring(0, 7).ToUpper();
@@ -115,7 +113,7 @@ namespace DMS.Application.Services
                 ModeTransport = "",
                 SensTrafic = "",
                 Session = 0,
-                ModuleOperation = activity.ModuleOperation ?? "",
+                //ModuleOperation = activity.ModuleOperation ?? "",
                 AddNewTime = DateTime.Now,
                 EditTime = DateTime.Now,
                 TenantId = Guid.Empty

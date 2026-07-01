@@ -10,7 +10,7 @@ namespace DMS.Infrastructure.IServices
 {
     public interface IArticleService<TEntityDTO> : IBaseService<TEntityDTO> where TEntityDTO : ArticleDto
     {
-        // ✅ Kendo
+        
         Task<DataSourceResult> GetAllAsync(DataSourceRequest requestModel);
 
         

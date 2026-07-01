@@ -21,22 +21,26 @@ namespace DMS.EFCore.Repositories
         }
 
         // ✅ Kendo
-        public async Task<DataSourceResult> GetAllAsync(DataSourceRequest requestModel)
-        {
-            return await dbContext.TnArticles.ToDataSourceResultAsync(requestModel);
-        }
+       public async Task<DataSourceResult> GetAllAsync(DataSourceRequest requestModel)
+{
+    return await dbContext.TnArticles
+        .Where(x => x.IndustryId == null)
+        .OrderBy(x => x.CodeArticle)
+        .ToDataSourceResultAsync(requestModel);
+}
 
         
 
-        // ✅ GET BY INDUSTRY
+        //  GET BY INDUSTRY
         public async Task<IEnumerable<TnArticle>> GetByIndustryAsync(int industryId)
         {
             return await dbContext.TnArticles
                 .Where(x => x.IndustryId == industryId)
+                 .OrderBy(x => x.CodeArticle)
                 .ToListAsync();
         }
 
-        // ✅ ADD
+        //  ADD
         public async Task AddAsync(TnArticle entity)
         {
             var tenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
@@ -52,40 +56,78 @@ namespace DMS.EFCore.Repositories
             await transaction.CommitAsync();
         }
 
-        // ✅ UPDATE
+        //  UPDATE
         public async Task UpdateAsync(TnArticle entity)
         {
             var existing = await dbContext.TnArticles
+                .AsNoTracking()  
                 .FirstOrDefaultAsync(x => x.CodeArticle == entity.CodeArticle);
+
             if (existing == null) return;
-            var tenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+
+            var tenantId = existing.TenantId; 
+
             using var transaction = await dbContext.Database.BeginTransactionAsync();
-            await dbContext.Database.ExecuteSqlRawAsync($"SET LOCAL app.tenant_id = '{tenantId}'");
-            existing.LibelleArticle = entity.LibelleArticle;
-            existing.DescriptionArticle = entity.DescriptionArticle;
-            existing.CategorieArticle = entity.CategorieArticle;
-            existing.IndustryId = entity.IndustryId;
-            existing.TenantId = tenantId;
-            existing.EditTime = DateTime.UtcNow;
-            await dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
+            try
+            {
+                await dbContext.Database.ExecuteSqlRawAsync(
+                    $"SET LOCAL app.tenant_id = '{tenantId}'");
+
+                await dbContext.Database.ExecuteSqlRawAsync(
+                    @"UPDATE dms_reference.""tn_Articles"" SET 
+                ""Libelle Article"" = {0},
+                ""Description Article"" = {1},
+                ""Categorie Article"" = {2},
+                ""industryId"" = {3}
+              WHERE ""Code Article"" = {4}",
+                    entity.LibelleArticle,
+                    entity.DescriptionArticle,
+                    entity.CategorieArticle,
+                    entity.IndustryId,
+                    entity.CodeArticle
+                );
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
-        // ✅ DELETE
+        //  DELETE
         public async Task DeleteAsync(int codeArticle)
         {
             var entity = await dbContext.TnArticles
+                .AsNoTracking()  
                 .FirstOrDefaultAsync(x => x.CodeArticle == codeArticle);
+
             if (entity == null) return;
-            var tenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+
+            var tenantId = entity.TenantId; 
+
             using var transaction = await dbContext.Database.BeginTransactionAsync();
-            await dbContext.Database.ExecuteSqlRawAsync($"SET LOCAL app.tenant_id = '{tenantId}'");
-            dbContext.TnArticles.Remove(entity);
-            await dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
+            try
+            {
+                await dbContext.Database.ExecuteSqlRawAsync(
+                    $"SET LOCAL app.tenant_id = '{tenantId}'");
+
+                await dbContext.Database.ExecuteSqlRawAsync(
+                    @"DELETE FROM dms_reference.""tn_Articles"" WHERE ""Code Article"" = {0}",
+                    codeArticle
+                );
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
-        // ✅ GET CATEGORIES BY INDUSTRY
+        //  GET CATEGORIES BY INDUSTRY
         public async Task<ProductServiceCategry> GetDefaultCategories()
         {
             return await dbContext.ProductServiceCategries
@@ -95,7 +137,7 @@ namespace DMS.EFCore.Repositories
            
         }
 
-        // ✅ GET ALL CATEGORIES
+        //  GET ALL CATEGORIES
         public async Task<IEnumerable<ProductServiceCategry>> GetAllCategoriesAsync()
         {
             return await dbContext.ProductServiceCategries

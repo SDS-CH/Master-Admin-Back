@@ -20,7 +20,7 @@ namespace DMS.API.Controllers
             _service = service;
         }
 
-        // ✅ Kendo
+        //  Kendo
         [HttpPost("getAll")]
         public async Task<IActionResult> GetAllAsync([DataSourceRequest] DataSourceRequest request)
     => Ok(await _service.GetAllAsync(request));

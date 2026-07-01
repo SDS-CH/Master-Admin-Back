@@ -1571,10 +1571,6 @@
          "ObjectType": 0
       },
       {
-         "Name": "dms_reference.tn_devises_ref",
-         "ObjectType": 0
-      },
-      {
          "Name": "dms_reference.tn_devisExcel_Details",
          "ObjectType": 0
       },
@@ -2617,6 +2613,10 @@
       {
          "Name": "dms_reference.WS_FileUpdates",
          "ObjectType": 0
+      },
+      {
+         "Name": "dms_reference.fn_translations_by_menu",
+         "ObjectType": 1
       }
    ],
    "UiHint": null,

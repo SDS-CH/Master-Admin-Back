@@ -8,10 +8,10 @@ namespace DMS.Infrastructure.IRepositories
 {
     public interface IArticleRepository<TEntity> : IGenericBaseRepository<TEntity> where TEntity : TnArticle
     {
-        // ✅ Kendo
+        
         Task<DataSourceResult> GetAllAsync(DataSourceRequest requestModel);
 
-        // ✅ Tes méthodes existantes
+       
         //Task<IEnumerable<TnArticle>> GetAllAsync();
         Task<IEnumerable<TnArticle>> GetByIndustryAsync(int industryId);
         Task AddAsync(TnArticle entity);

@@ -795,8 +795,6 @@ public partial class DmsReferenceContext : DbContext
 
     public virtual DbSet<TnDevise> TnDevises { get; set; }
 
-    public virtual DbSet<TnDevisesRef> TnDevisesRefs { get; set; }
-
     public virtual DbSet<TnDivision> TnDivisions { get; set; }
 
     public virtual DbSet<TnDivisionsClient> TnDivisionsClients { get; set; }
@@ -9294,7 +9292,7 @@ public partial class DmsReferenceContext : DbContext
 
             entity.HasIndex(e => e.SalesCategory, "fki_tn_Articles$rubric_cotation$Code_Rubric_Cotation");
 
-            entity.Property(e => e.CodeArticle).HasColumnName("Code Article").ValueGeneratedOnAdd(); 
+            entity.Property(e => e.CodeArticle).HasColumnName("Code Article");
             entity.Property(e => e.AccountPurchases)
                 .HasMaxLength(15)
                 .HasColumnName("Account Purchases");
@@ -11822,22 +11820,7 @@ public partial class DmsReferenceContext : DbContext
             entity.Property(e => e.LibelleDevise)
                 .HasMaxLength(50)
                 .HasColumnName("Libelle Devise");
-        });
-
-        modelBuilder.Entity<TnDevisesRef>(entity =>
-        {
-            entity.HasKey(e => e.Code).HasName("tn_devises_ref_pkey");
-
-            entity.ToTable("tn_devises_ref", "dms_reference");
-
-            entity.Property(e => e.Code)
-                .HasMaxLength(3)
-                .IsFixedLength()
-                .HasColumnName("code");
-            entity.Property(e => e.Label)
-                .IsRequired()
-                .HasMaxLength(150)
-                .HasColumnName("label");
+            entity.Property(e => e.TenantId).HasColumnName("tenant_id");
         });
 
         modelBuilder.Entity<TnDivision>(entity =>

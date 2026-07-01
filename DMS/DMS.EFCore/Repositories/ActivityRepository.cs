@@ -1,53 +1,59 @@
-﻿using DMS.DTO.DTOs;
 using DMS.Entities.Models;
-using Microsoft.EntityFrameworkCore;
 using DMS.Infrastructure.IRepositories;
+using Master.Common.Classes.EFCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace DMS.EFCore.Repositories
 {
-    public class ActivityRepository : IActivityRepository
+    public class ActivityRepository : GenericBaseRepository<TnActivite, DmsReferenceContext>, IActivityRepository<TnActivite>
     {
-        private readonly postgresContext _context;  // ← postgresContext pas DmsDbContex
-
-        public ActivityRepository(postgresContext context)  // ← context pas _context
+        public ActivityRepository(DmsReferenceContext context) : base(context)
         {
-            _context = context;  // ← _context = context
+            dbContext = context;
         }
 
-        public async Task<IEnumerable<ActivityDto>> GetAll()
+        public async Task<List<TnActivite>> GetAllActivities(int? industryId = null, bool unassignedOnly = false)
         {
-            return await _context.TnActivites
-                .OrderBy(a => a.CodeActivite)
-                .Select(a => new ActivityDto
-                {
-                    CodeActivite = a.CodeActivite,
-                    LibelleActivite = a.LibelleActivite,
-                    ModuleOperation = a.ModuleOperation,
-                    ConcernFacturation = a.ConcernFacturation,
-                    Session = a.Session,
-                    AddNewTime = a.AddNewTime,
-                    EditTime = a.EditTime,
-                    TenantId = a.TenantId,
-                    IndustryId = a.IndustryId
-                }).ToListAsync();
-        }
+            var query = dbContext.TnActivites.AsNoTracking();
 
-        public async Task Add(ActivityDto dto)
-        {
-            var activity = new TnActivite
+            if (unassignedOnly)
             {
-                CodeActivite = dto.CodeActivite,
-                LibelleActivite = dto.LibelleActivite,
-                ModuleOperation = dto.ModuleOperation,
-                ConcernFacturation = dto.ConcernFacturation,
-                Session = dto.Session,
-                AddNewTime = DateTime.Now,
-                EditTime = DateTime.Now,
-                TenantId = dto.TenantId,
-                IndustryId = dto.IndustryId
-            };
-            _context.TnActivites.Add(activity);
-            await _context.SaveChangesAsync();
+                query = query.Where(a => a.IndustryId == null);
+            }
+            else if (industryId.HasValue)
+            {
+                query = query.Where(a => a.IndustryId == industryId.Value);
+            }
+
+            return await query.OrderBy(a => a.CodeActivite).ToListAsync();
+        }
+
+       
+
+        public async Task<TnActivite?> UpdateActivity(string codeActivite, Guid tenantId, TnActivite activity)
+        {
+            var existing = await dbContext.TnActivites.FindAsync(codeActivite, tenantId);
+
+            if (existing is null)
+            {
+                return null;
+            }
+
+            existing.LibelleActivite = activity.LibelleActivite;
+            existing.ModuleOperation = activity.ModuleOperation;
+            existing.ConcernFacturation = activity.ConcernFacturation;
+            existing.Session = activity.Session;
+            existing.EditTime = activity.EditTime;
+            existing.IndustryId = activity.IndustryId;
+
+            await dbContext.SaveChangesAsync();
+            return existing;
+        }
+
+        public async Task<bool> DeleteActivity(string codeActivite, Guid tenantId)
+        {
+            var deleted = await Delete(new object[] { codeActivite, tenantId });
+            return deleted > 0;
         }
     }
 }

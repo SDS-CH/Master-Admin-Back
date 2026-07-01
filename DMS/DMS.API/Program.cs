@@ -1,17 +1,16 @@
-using DMS.DIContainerCore;
+using DMS.DTO.DTOs;
+using DMS.EFCore.Repositories;
+using DMS.Entities.Models;
+using DMS.Infrastructure.IRepositories;
+using DMS.Infrastructure.IServices;
 using DMS.Infrastructure.MappingProfiles;
+using DMS.Services.Services;
 using Master.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
-using AutoMapper;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
-using DMS.Entities.Models;
-using DMS.EFCore.Repositories;
-using DMS.EFCore;
-using DMS.Infrastructure.IRepositories;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,17 +35,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-ContainerExtension.Initialize(builder.Services, connectionString!);
-
-// Enregistrement du DbContext et du repository d'activité
+builder.Services.AddDbContext<DmsReferenceContext>(options =>
+    options.UseNpgsql(connectionString, o => o.CommandTimeout(180)));
 builder.Services.AddDbContext<postgresContext>(options =>
     options.UseNpgsql(connectionString));
 
+builder.Services.AddTransient<IDepartmentRepository<Department>, DepartmentRepository>();
+builder.Services.AddTransient<IDepartmentService<DepartmentDTO>,
+    DepartmentService<DepartmentDTO, Department, DmsReferenceContext>>();
 
-builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
+builder.Services.AddScoped<IActivityRepository<TnActivite>, ActivityRepository>();
+builder.Services.AddScoped<IActivityService<ActivityDto>,
+    ActivityService<ActivityDto, TnActivite, DmsReferenceContext>>();
+
+builder.Services.AddScoped<IGedDocumentCategoryRepository<GedDocumentCategory>, GedDocumentCategoryRepository>();
+builder.Services.AddScoped<IGedDocumentCategoryService<GedDocumentCategoryDto>,
+    GedDocumentCategoryService<GedDocumentCategoryDto, GedDocumentCategory, DmsReferenceContext>>();
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DepartmentProfile)));
-
 builder.Services.AddKendo();
 
 builder.Services.AddControllers()
@@ -98,6 +104,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DmsReferenceContext>();
+    db.Database.ExecuteSqlRaw("""
+        ALTER TABLE dms_reference."GED_DocumentType"
+        ADD COLUMN IF NOT EXISTS "industryId" integer;
+        """);
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -110,16 +125,3 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
-
-// ── Un seul DbContext ──────────────────────────────────────────
-builder.Services.AddDbContext<postgresContext>(options =>
-    options.UseNpgsql(connectionString));
-
-// ── Repositories ───────────────────────────────────────────────
-builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
-
-// Supprime complètement AppDbContext — plus besoin
-builder.Services.AddDbContext<postgresContext>(options =>
-    options.UseNpgsql(connectionString, npgsql =>
-        npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "erpmaster"))
-);

@@ -1,29 +1,12 @@
-﻿using DMS.Entities.Models;
-using Kendo.Mvc.UI;
-using Master.Common.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using DMS.DTO.DTOs;
+using DMS.Entities.Models;
+using Master.Common.Interfaces;
 
 namespace DMS.Infrastructure.IRepositories
-
 {
-
-    public interface IActivityRepository
-
+    public interface IActivityRepository<TEntity> : IGenericBaseRepository<TEntity> where TEntity : TnActivite
     {
-
-        Task<IEnumerable<ActivityDto>> GetAll();
-
-
-        Task Add(ActivityDto dto);
-
-
+        Task<List<TEntity>> GetAllActivities(int? industryId = null, bool unassignedOnly = false);
+        Task<TEntity?> UpdateActivity(string codeActivite, Guid tenantId, TEntity activity);
+        Task<bool> DeleteActivity(string codeActivite, Guid tenantId);
     }
-
 }
- 

@@ -16,9 +16,9 @@ namespace DMS.API.Controllers
 
     {
 
-        private readonly IActivityService _service;
+        private readonly IActivityService<ActivityDto> _service;
 
-        public ActivitiesController(IActivityService service)
+        public ActivitiesController(IActivityService<ActivityDto> service)
 
         {
 
@@ -26,15 +26,15 @@ namespace DMS.API.Controllers
 
         }
 
-        // GET api/activities
+
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int? industryId, [FromQuery] bool unassignedOnly = false)
 
         {
 
-            var activities = await _service.GetAll();
+            var activities = await _service.GetAll(industryId, unassignedOnly);
 
             return Ok(activities);
 
@@ -51,6 +51,42 @@ namespace DMS.API.Controllers
             await _service.Add(dto);
 
             return Ok(new { message = "Activité ajoutée !" });
+
+        }
+
+        [HttpPut("{codeActivite}")]
+
+        public async Task<IActionResult> Update(string codeActivite, [FromQuery] Guid? tenantId, ActivityDto dto)
+
+        {
+
+            var updated = await _service.Update(codeActivite, tenantId ?? Guid.Empty, dto);
+
+            return updated ? Ok(new { message = "Activité modifiée !" }) : NotFound();
+
+        }
+
+        [HttpDelete("{codeActivite}")]
+
+        public async Task<IActionResult> Delete(string codeActivite, [FromQuery] Guid? tenantId)
+
+        {
+
+            var deleted = await _service.Delete(codeActivite, tenantId ?? Guid.Empty);
+
+            return deleted ? Ok(new { message = "Activité supprimée !" }) : NotFound();
+
+        }
+
+        [HttpDelete]
+
+        public async Task<IActionResult> DeleteByQuery([FromQuery] string codeActivite, [FromQuery] Guid? tenantId)
+
+        {
+
+            var deleted = await _service.Delete(codeActivite ?? string.Empty, tenantId ?? Guid.Empty);
+
+            return deleted ? Ok(new { message = "Activité supprimée !" }) : NotFound();
 
         }
 

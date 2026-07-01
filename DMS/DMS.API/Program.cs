@@ -4,13 +4,8 @@ using Master.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
-using System.Text;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using DMS.Entities.Models;
-using DMS.EFCore;
-using DMS.EFCore.Repositories;
-using DMS.Infrastructure.IRepositories;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,13 +29,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-
+var connectionString = builder.Configuration.GetConnectionString("DmsReference");
 ContainerExtension.Initialize(builder.Services, connectionString!);
 
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DepartmentProfile)));
 
-builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DepartmentProfile), typeof(ArticleProfile)));
 builder.Services.AddKendo();
 
 builder.Services.AddControllers()
@@ -103,5 +96,4 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();

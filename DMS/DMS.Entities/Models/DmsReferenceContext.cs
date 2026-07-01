@@ -795,6 +795,8 @@ public partial class DmsReferenceContext : DbContext
 
     public virtual DbSet<TnDevise> TnDevises { get; set; }
 
+    public virtual DbSet<TnDevisesRef> TnDevisesRefs { get; set; }
+
     public virtual DbSet<TnDivision> TnDivisions { get; set; }
 
     public virtual DbSet<TnDivisionsClient> TnDivisionsClients { get; set; }
@@ -11821,6 +11823,22 @@ public partial class DmsReferenceContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("Libelle Devise");
             entity.Property(e => e.TenantId).HasColumnName("tenant_id");
+        });
+
+        modelBuilder.Entity<TnDevisesRef>(entity =>
+        {
+            entity.HasKey(e => e.Code).HasName("tn_devises_ref_pkey");
+
+            entity.ToTable("tn_Devises_ref", "dms_reference");
+
+            entity.Property(e => e.Code)
+                .HasMaxLength(3)
+                .IsFixedLength()
+                .HasColumnName("code");
+            entity.Property(e => e.Label)
+                .IsRequired()
+                .HasMaxLength(150)
+                .HasColumnName("label");
         });
 
         modelBuilder.Entity<TnDivision>(entity =>

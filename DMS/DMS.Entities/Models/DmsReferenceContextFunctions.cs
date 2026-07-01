@@ -1,0 +1,66 @@
+﻿#nullable disable
+using DMS.Entities.Models;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace DMS.Entities.Models
+{
+    public partial class DmsReferenceContext
+    {
+        private IDmsReferenceContextFunctions _procedures;
+
+        //  Renommé en DbFunctions pour éviter le conflit avec DbSet<Function> Functions
+        public virtual IDmsReferenceContextFunctions DbFunctions
+        {
+            get
+            {
+                if (_procedures is null) _procedures = new DmsReferenceContextFunctions(this);
+                return _procedures;
+            }
+            set
+            {
+                _procedures = value;
+            }
+        }
+
+        public IDmsReferenceContextFunctions GetFunctions()
+        {
+            return DbFunctions;
+        }
+    }
+
+    public partial class DmsReferenceContextFunctions : IDmsReferenceContextFunctions
+    {
+        private readonly DmsReferenceContext _context;
+
+        public DmsReferenceContextFunctions(DmsReferenceContext context)
+        {
+            _context = context;
+        }
+
+        public virtual async Task<List<fn_translations_by_menuResult>> fn_translations_by_menuAsync(string p_menu, CancellationToken cancellationToken = default)
+        {
+            var npgsqlParameters = new[]
+            {
+                new NpgsqlParameter
+                {
+                    ParameterName = "p_menu",
+                    Value = p_menu ?? Convert.DBNull,
+                    NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Varchar,
+                },
+            };
+
+            var _ = await _context.SqlQueryAsync<fn_translations_by_menuResult>(
+                "SELECT * FROM \"dms_reference\".\"fn_translations_by_menu\" (@p_menu)",
+                npgsqlParameters,
+                cancellationToken);
+
+            return _;
+        }
+    }
+}

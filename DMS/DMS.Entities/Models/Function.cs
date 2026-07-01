@@ -14,6 +14,8 @@ public partial class Function
 
     public Guid TenantId { get; set; }
 
+    public bool IsDefault { get; set; }
+
     public virtual ICollection<JobTitle> JobTitles { get; set; } = new List<JobTitle>();
 
     public virtual ICollection<TarifFunction> TarifFunctions { get; set; } = new List<TarifFunction>();

@@ -28,6 +28,8 @@ public partial class TnDevise
 
     public double? CashCountingDiffLimit { get; set; }
 
+    public Guid TenantId { get; set; }
+
     public virtual ICollection<DsDetailsService> DsDetailsServices { get; set; } = new List<DsDetailsService>();
 
     public virtual ICollection<DsTarifFonction> DsTarifFonctions { get; set; } = new List<DsTarifFonction>();

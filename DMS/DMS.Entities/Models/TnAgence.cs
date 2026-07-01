@@ -84,8 +84,6 @@ public partial class TnAgence
 
     public virtual ICollection<TnCodesEtape> TnCodesEtapes { get; set; } = new List<TnCodesEtape>();
 
-    public virtual ICollection<TnCodesTaxis> TnCodesTaxes { get; set; } = new List<TnCodesTaxis>();
-
     public virtual ICollection<TnComptesComptable> TnComptesComptables { get; set; } = new List<TnComptesComptable>();
 
     public virtual ICollection<TnDevi> TnDevis { get; set; } = new List<TnDevi>();

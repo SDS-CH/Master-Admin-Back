@@ -119,10 +119,6 @@ public partial class PcCompteComptable
 
     public virtual ICollection<TnClient> TnClients { get; set; } = new List<TnClient>();
 
-    public virtual ICollection<TnCodesTaxis> TnCodesTaxisPcCompteComptableNavigations { get; set; } = new List<TnCodesTaxis>();
-
-    public virtual ICollection<TnCodesTaxis> TnCodesTaxisPcCompteComptables { get; set; } = new List<TnCodesTaxis>();
-
     public virtual ICollection<TnDetailsCompte> TnDetailsComptes { get; set; } = new List<TnDetailsCompte>();
 
     public virtual ICollection<TnProduitsStock> TnProduitsStocks { get; set; } = new List<TnProduitsStock>();

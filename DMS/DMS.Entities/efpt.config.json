@@ -4,18 +4,14 @@
    "ContextNamespace": null,
    "FilterSchemas": false,
    "IncludeConnectionString": false,
-   "IrregularWords": null,
-   "MinimumProductVersion": "2.6.1248",
    "ModelNamespace": null,
    "OutputContextPath": null,
    "OutputPath": "Models",
-   "PluralRules": null,
    "PreserveCasingWithRegex": true,
    "ProjectRootNamespace": "DMS.Entities",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 0,
-   "SingularRules": null,
    "T4TemplatePath": null,
    "Tables": [
       {
@@ -1399,10 +1395,6 @@
          "ObjectType": 0
       },
       {
-         "Name": "dms_reference.tn_Codes_Taxes",
-         "ObjectType": 0
-      },
-      {
          "Name": "dms_reference.tn_Codes_Validites",
          "ObjectType": 0
       },
@@ -1576,10 +1568,6 @@
       },
       {
          "Name": "dms_reference.tn_Devises",
-         "ObjectType": 0
-      },
-      {
-         "Name": "dms_reference.tn_devises_ref",
          "ObjectType": 0
       },
       {
@@ -2351,6 +2339,14 @@
          "ObjectType": 0
       },
       {
+         "Name": "dms_reference.translation_data",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dms_reference.translation_field",
+         "ObjectType": 0
+      },
+      {
          "Name": "dms_reference.tx_Dossiers",
          "ObjectType": 0
       },
@@ -2617,6 +2613,10 @@
       {
          "Name": "dms_reference.WS_FileUpdates",
          "ObjectType": 0
+      },
+      {
+         "Name": "dms_reference.fn_translations_by_menu",
+         "ObjectType": 1
       }
    ],
    "UiHint": null,

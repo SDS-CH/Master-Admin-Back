@@ -34,23 +34,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<DmsReferenceContext>(options =>
-    options.UseNpgsql(connectionString, o => o.CommandTimeout(180)));
-builder.Services.AddDbContext<postgresContext>(options =>
-    options.UseNpgsql(connectionString));
-
-builder.Services.AddTransient<IDepartmentRepository<Department>, DepartmentRepository>();
-builder.Services.AddTransient<IDepartmentService<DepartmentDTO>,
-    DepartmentService<DepartmentDTO, Department, DmsReferenceContext>>();
-
-builder.Services.AddScoped<IActivityRepository<TnActivite>, ActivityRepository>();
-builder.Services.AddScoped<IActivityService<ActivityDto>,
-    ActivityService<ActivityDto, TnActivite, DmsReferenceContext>>();
-
-builder.Services.AddScoped<IGedDocumentCategoryRepository<GedDocumentCategory>, GedDocumentCategoryRepository>();
-builder.Services.AddScoped<IGedDocumentCategoryService<GedDocumentCategoryDto>,
-    GedDocumentCategoryService<GedDocumentCategoryDto, GedDocumentCategory, DmsReferenceContext>>();
+var connectionString = builder.Configuration.GetConnectionString("DmsReference");
+ContainerExtension.Initialize(builder.Services, connectionString!);
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DepartmentProfile)));
 builder.Services.AddKendo();

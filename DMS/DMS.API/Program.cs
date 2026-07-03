@@ -90,14 +90,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<DmsReferenceContext>();
-    db.Database.ExecuteSqlRaw("""
-        ALTER TABLE dms_reference."GED_DocumentType"
-        ADD COLUMN IF NOT EXISTS "industryId" integer;
-        """);
-}
 
 if (app.Environment.IsDevelopment())
 {

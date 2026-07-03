@@ -1,102 +1,106 @@
-﻿//using DMS.Entities.Models;
-//using DMS.Infrastructure.IRepositories;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-//using Microsoft.EntityFrameworkCore;
+﻿using DMS.Entities.Models;
+using DMS.Infrastructure.IRepositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
-//namespace DMS.EFCore.Repositories
-//{
-//    public class RegimeRepository : IRegimeRepository
-//    {
-//        private readonly DmsReferenceContext _context;
+#nullable disable
+using DMS.Entities.Models;
+using DMS.Infrastructure.IRepositories;
+using Master.Common.Classes.EFCore;
+using Microsoft.EntityFrameworkCore;
 
-//        public RegimeRepository(DmsReferenceContext context)
-//        {
-//            _context = context;
-//        }
+namespace DMS.EFCore.Repositories
+{
+    public class RegimeRepository : GenericBaseRepository<TnCodesRegime, DmsReferenceContext>, IRegimeRepository<TnCodesRegime>
+    {
+        public RegimeRepository(DmsReferenceContext context) : base(context)
+        {
+            dbContext = context;
+        }
 
-//        public async Task<List<TnCodesRegime>> GetRegimesByFileTypeAsync(string fileTypeCode)
-//        {
-//            return await _context.TnFileTypeRegimes
-//                .Where(ftr => ftr.FileType == fileTypeCode)
-//                .Include(ftr => ftr.TnCodesRegime)
-//                .Select(ftr => ftr.TnCodesRegime)
-//                .Where(r => r != null)
-//                .ToListAsync();
-//        }
+        // Référentiel global — pour le dropdown "Select Regimes..."
+        public async Task<List<TnCodesRegime>> GetAllAsync()
+        {
+            return await dbContext.TnCodesRegimes
+                .OrderBy(x => x.Label)
+                .ToListAsync();
+        }
 
-//        public async Task<List<TnCodesRegime>> GetAvailableRegimesAsync(string fileTypeCode)
-//        {
-//            var linkedCodes = _context.TnFileTypeRegimes
-//                .Where(ftr => ftr.FileType == fileTypeCode)
-//                .Select(ftr => ftr.RegimeCode);
+        // Regimes liés à un FileType — via la navigation property TnCodesRegime
+        public async Task<List<TnCodesRegime>> GetByFileTypeAsync(string codeTypeDossier)
+        {
+            return await dbContext.TnFileTypeRegimes
+                .Include(x => x.TnCodesRegime)
+                .Where(x => x.FileType == codeTypeDossier)
+                .Select(x => x.TnCodesRegime)
+                .OrderBy(x => x.Label)
+                .ToListAsync();
+        }
 
-//            return await _context.TnCodesRegimes
-//                .Where(r => !linkedCodes.Contains(r.CodeRegime))
-//                .OrderBy(r => r.Label)
-//                .ToListAsync();
-//        }
+        public async Task<TnCodesRegime> GetByCodeAsync(string codeRegime)
+        {
+            return await dbContext.TnCodesRegimes
+                .FirstOrDefaultAsync(x => x.CodeRegime == codeRegime);
+        }
 
-//        public async Task<bool> RegimeCodeExistsAsync(string regimeCode)
-//        {
-//            return await _context.TnCodesRegimes
-//                .AnyAsync(r => r.CodeRegime == regimeCode);
-//        }
+        // Même pattern tenant_id que CreateWithOperationPlanAsync (FileType)
+        public async Task AddAsync(TnCodesRegime regime)
+        {
+            var existingRecord = await dbContext.TnCodesRegimes.FirstOrDefaultAsync();
+            var tenantId = existingRecord?.TenantId ?? Guid.Empty;
 
-//        public async Task<TnCodesRegime> CreateRegimeAsync(TnCodesRegime regime)
-//        {
-//            // tenant_id est injecté automatiquement par la RLS Postgres à l'insertion,
-//            // comme pour les autres entités multi-tenant de l'app (TnActivite, TnTypesDossier...).
-//            _context.TnCodesRegimes.Add(regime);
-//            await _context.SaveChangesAsync();
-//            return regime;
-//        }
+            await dbContext.Database.ExecuteSqlRawAsync(
+                $"SET LOCAL app.tenant_id = '{tenantId}'");
 
-//        public async Task<TnCodesRegime?> UpdateRegimeAsync(string regimeCode, string? label, string? descriptionRegime, string? acronym)
-//        {
-//            var regime = await _context.TnCodesRegimes
-//                .FirstOrDefaultAsync(r => r.CodeRegime == regimeCode);
+            regime.TenantId = tenantId;
 
-//            if (regime == null) return null;
+            await dbContext.TnCodesRegimes.AddAsync(regime);
+            await dbContext.SaveChangesAsync();
+        }
 
-//            regime.Label = label;
-//            regime.DescriptionRegime = descriptionRegime;
-//            regime.Acronym = acronym;
+        public async Task<bool> IsLinkedAsync(string codeTypeDossier, string codeRegime)
+        {
+            return await dbContext.TnFileTypeRegimes
+                .AnyAsync(x => x.FileType == codeTypeDossier && x.RegimeCode == codeRegime);
+        }
 
-//            await _context.SaveChangesAsync();
-//            return regime;
-//        }
+        // Lien idempotent (validé ensemble) : si déjà lié → on ne fait rien
+        public async Task LinkToFileTypeAsync(string codeTypeDossier, string codeRegime)
+        {
+            var alreadyLinked = await IsLinkedAsync(codeTypeDossier, codeRegime);
+            if (alreadyLinked) return;
 
-//        public async Task LinkRegimeToFileTypeAsync(string fileTypeCode, string regimeCode)
-//        {
-//            var link = new TnFileTypeRegime
-//            {
-//                FileType = fileTypeCode,
-//                RegimeCode = regimeCode
-//            };
-//            _context.TnFileTypeRegimes.Add(link);
-//            await _context.SaveChangesAsync();
-//        }
+            var existingRecord = await dbContext.TnFileTypeRegimes.FirstOrDefaultAsync();
+            var tenantId = existingRecord?.TenantId ?? Guid.Empty;
 
-//        public async Task<bool> UnlinkRegimeFromFileTypeAsync(string fileTypeCode, string regimeCode)
-//        {
-//            var link = await _context.TnFileTypeRegimes
-//                .FirstOrDefaultAsync(ftr => ftr.FileType == fileTypeCode && ftr.RegimeCode == regimeCode);
+            await dbContext.Database.ExecuteSqlRawAsync(
+                $"SET LOCAL app.tenant_id = '{tenantId}'");
 
-//            if (link == null) return false;
+            var link = new TnFileTypeRegime
+            {
+                FileType = codeTypeDossier,
+                RegimeCode = codeRegime,
+                TenantId = tenantId
+            };
 
-//            _context.TnFileTypeRegimes.Remove(link);
-//            await _context.SaveChangesAsync();
-//            return true;
-//        }
+            await dbContext.TnFileTypeRegimes.AddAsync(link);
+            await dbContext.SaveChangesAsync();
+        }
 
-//        public async Task<bool> IsRegimeLinkedToFileTypeAsync(string fileTypeCode, string regimeCode)
-//        {
-//            return await _context.TnFileTypeRegimes
-//                .AnyAsync(ftr => ftr.FileType == fileTypeCode && ftr.RegimeCode == regimeCode);
-//        }
-//    }
-//}
+        // Détache uniquement le lien (FileType + RegimeCode) — ne touche pas tn_Codes_Regimes
+        public async Task UnlinkFromFileTypeAsync(string codeTypeDossier, string codeRegime)
+        {
+            var link = await dbContext.TnFileTypeRegimes
+                .FirstOrDefaultAsync(x => x.FileType == codeTypeDossier && x.RegimeCode == codeRegime);
+
+            if (link == null) return;
+
+            dbContext.TnFileTypeRegimes.Remove(link);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+}

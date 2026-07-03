@@ -10,7 +10,7 @@ namespace DMS.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize]
+    
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService<DepartmentDTO> _service;

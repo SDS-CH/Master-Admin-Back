@@ -1,27 +1,19 @@
-﻿//using System.Collections.Generic;
-//using System.Threading.Tasks;
-//using DMS.Entities.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using DMS.Entities.Models;
 
-//namespace DMS.Infrastructure.IRepositories
-//{
-//    public interface IRegimeRepository
-//    {
-//        /// <summary>Régimes déjà liés à ce file type (pour la grille).</summary>
-//        Task<List<TnCodesRegime>> GetRegimesByFileTypeAsync(string fileTypeCode);
+using Master.Common.Interfaces;
 
-//        /// <summary>Régimes existants MAIS PAS ENCORE liés à ce file type (pour le dropdown "Select Regimes...").</summary>
-//        Task<List<TnCodesRegime>> GetAvailableRegimesAsync(string fileTypeCode);
-
-//        Task<bool> RegimeCodeExistsAsync(string regimeCode);
-
-//        Task<TnCodesRegime> CreateRegimeAsync(TnCodesRegime regime);
-
-//        Task<TnCodesRegime?> UpdateRegimeAsync(string regimeCode, string? label, string? descriptionRegime, string? acronym);
-
-//        Task LinkRegimeToFileTypeAsync(string fileTypeCode, string regimeCode);
-
-//        Task<bool> UnlinkRegimeFromFileTypeAsync(string fileTypeCode, string regimeCode);
-
-//        Task<bool> IsRegimeLinkedToFileTypeAsync(string fileTypeCode, string regimeCode);
-//    }
-//}
+namespace DMS.Infrastructure.IRepositories
+{
+    public interface IRegimeRepository<TEntity> : IGenericBaseRepository<TEntity> where TEntity : TnCodesRegime
+    {
+        Task<List<TnCodesRegime>> GetAllAsync();
+        Task<List<TnCodesRegime>> GetByFileTypeAsync(string codeTypeDossier);
+        Task<TnCodesRegime> GetByCodeAsync(string codeRegime);
+        Task AddAsync(TnCodesRegime regime);
+        Task<bool> IsLinkedAsync(string codeTypeDossier, string codeRegime);
+        Task LinkToFileTypeAsync(string codeTypeDossier, string codeRegime);
+        Task UnlinkFromFileTypeAsync(string codeTypeDossier, string codeRegime);
+    }
+}

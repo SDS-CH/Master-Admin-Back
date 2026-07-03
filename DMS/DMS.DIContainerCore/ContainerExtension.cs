@@ -24,26 +24,25 @@ namespace DMS.DIContainerCore
                 ArticleService<ArticleDto, TnArticle, DmsReferenceContext>>();
 
             // Department
-            services.AddTransient<IDepartmentRepository<Department>, DepartmentRepository>();            services.AddTransient<IDepartmentService<DepartmentDTO>,
+            services.AddTransient<IDepartmentRepository<Department>, DepartmentRepository>();
+            services.AddTransient<IDepartmentService<DepartmentDTO>,
                 DepartmentService<DepartmentDTO, Department, DmsReferenceContext>>();
 
             // Translation 
             services.AddTransient<ITranslationRepository, TranslationRepository>();
             services.AddTransient<ITranslationService, TranslationService>();
-            services.AddTransient<IDepartmentService<DepartmentDTO>, DepartmentService<DepartmentDTO, Department, DmsReferenceContext>>();    
-            
+            services.AddTransient<IDepartmentService<DepartmentDTO>, DepartmentService<DepartmentDTO, Department, DmsReferenceContext>>();
+
+            // FileType
             services.AddTransient<IFileTypeRepository<TnTypesDossier>, FileTypeRepository>();
             services.AddTransient<IFileTypeService<FileTypeDto>, FileTypeService<FileTypeDto, TnTypesDossier, DmsReferenceContext>>();
 
-            // Activity
+            // Regime
+            services.AddTransient<IRegimeRepository<TnCodesRegime>, RegimeRepository>();
+            services.AddTransient<IRegimeService<RegimeDto>, RegimeService<RegimeDto, TnCodesRegime, DmsReferenceContext>>();
+            // Activities
             services.AddTransient<IActivityRepository<TnActivite>, ActivityRepository>();
-            services.AddTransient<IActivityService<ActivityDto>,
-                ActivityService<ActivityDto, TnActivite, DmsReferenceContext>>();
-
-            // GedDocumentCategory
-            services.AddTransient<IGedDocumentCategoryRepository<GedDocumentCategory>, GedDocumentCategoryRepository>();
-            services.AddTransient<IGedDocumentCategoryService<GedDocumentCategoryDto>,
-                GedDocumentCategoryService<GedDocumentCategoryDto, GedDocumentCategory, DmsReferenceContext>>();
+            services.AddTransient<IActivityService<ActivityDto>, ActivityService<ActivityDto, TnActivite, DmsReferenceContext>>();
         }
     }
 }

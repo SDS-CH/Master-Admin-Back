@@ -1,97 +1,79 @@
-﻿//using DMS.DTO.DTOs;
-//using DMS.Infrastructure.IServices;
-//using Microsoft.AspNetCore.Mvc;
+﻿using DMS.Infrastructure.IServices;
+using DMS.DTO.DTOs;
+using Microsoft.AspNetCore.Mvc;
 
-//namespace DMS.API.Controllers
-//{
-//    [ApiController]
-//    [Route("api/[controller]")]
-//    public class RegimesController : ControllerBase
-//    {
-//        private readonly IRegimeService _regimeService;
+namespace DMS.API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class RegimesController : ControllerBase
+    {
+        private readonly IRegimeService<RegimeDto> _service;
 
-//        public RegimesController(IRegimeService regimeService)
-//        {
-//            _regimeService = regimeService;
-//        }
+        public RegimesController(IRegimeService<RegimeDto> service)
+        {
+            _service = service;
+        }
 
-//        // GET api/Regimes/filetype/FCADV01
-//        // Régimes déjà liés à ce file type (pour la grille)
-//        [HttpGet("filetype/{fileTypeCode}")]
-//        public async Task<IActionResult> GetByFileType(string fileTypeCode)
-//        {
-//            if (string.IsNullOrWhiteSpace(fileTypeCode))
-//                return BadRequest("Le code du File Type est requis.");
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _service.GetAllAsync();
+            return Ok(result);
+        }
 
-//            var regimes = await _regimeService.GetRegimesByFileTypeAsync(fileTypeCode);
-//            return Ok(regimes);
-//        }
+        [HttpGet("filetype/{codeTypeDossier}")]
+        public async Task<IActionResult> GetByFileType(string codeTypeDossier)
+        {
+            var result = await _service.GetByFileTypeAsync(codeTypeDossier);
+            return Ok(result);
+        }
 
-//        // GET api/Regimes/available/FCADV01
-//        // Régimes existants mais pas encore liés (pour le dropdown "Select Regimes...")
-//        [HttpGet("available/{fileTypeCode}")]
-//        public async Task<IActionResult> GetAvailable(string fileTypeCode)
-//        {
-//            if (string.IsNullOrWhiteSpace(fileTypeCode))
-//                return BadRequest("Le code du File Type est requis.");
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateRegimeDto dto)
+        {
+            try
+            {
+                await _service.CreateAsync(dto);
+                return Ok(new { message = "Regime created successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message,
+                    inner = ex.InnerException?.Message,
+                    inner2 = ex.InnerException?.InnerException?.Message
+                });
+            }
+        }
 
-//            var regimes = await _regimeService.GetAvailableRegimesAsync(fileTypeCode);
-//            return Ok(regimes);
-//        }
+        [HttpPost("link")]
+        public async Task<IActionResult> Link(LinkRegimeDto dto)
+        {
+            try
+            {
+                await _service.LinkAsync(dto);
+                return Ok(new { message = "Regime(s) linked successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
-//        // POST api/Regimes
-//        // Crée un nouveau régime ET le lie automatiquement au FileTypeCode fourni
-//        [HttpPost]
-//        public async Task<IActionResult> Create([FromBody] CreateRegimeDto dto)
-//        {
-//            try
-//            {
-//                var created = await _regimeService.CreateRegimeAndLinkAsync(dto);
-//                return CreatedAtAction(nameof(GetByFileType), new { fileTypeCode = dto.FileTypeCode }, created);
-//            }
-//            catch (InvalidOperationException ex)
-//            {
-//                return Conflict(new { message = ex.Message });
-//            }
-//        }
-
-//        // PUT api/Regimes/DIAG
-//        [HttpPut("{regimeCode}")]
-//        public async Task<IActionResult> Update(string regimeCode, [FromBody] UpdateRegimeDto dto)
-//        {
-//            var updated = await _regimeService.UpdateRegimeAsync(regimeCode, dto);
-//            if (updated == null)
-//                return NotFound(new { message = $"Régime \"{regimeCode}\" introuvable." });
-
-//            return Ok(updated);
-//        }
-
-//        // POST api/Regimes/link
-//        // Lie un régime EXISTANT à un file type (depuis le dropdown "Select Regimes...")
-//        [HttpPost("link")]
-//        public async Task<IActionResult> Link([FromBody] LinkRegimeDto dto)
-//        {
-//            try
-//            {
-//                await _regimeService.LinkRegimeAsync(dto);
-//                return Ok();
-//            }
-//            catch (InvalidOperationException ex)
-//            {
-//                return Conflict(new { message = ex.Message });
-//            }
-//        }
-
-//        // DELETE api/Regimes/unlink/FCADV01/DIAG
-//        // Retire le lien entre un régime et un file type (ne supprime pas le régime lui-même)
-//        [HttpDelete("unlink/{fileTypeCode}/{regimeCode}")]
-//        public async Task<IActionResult> Unlink(string fileTypeCode, string regimeCode)
-//        {
-//            var removed = await _regimeService.UnlinkRegimeAsync(fileTypeCode, regimeCode);
-//            if (!removed)
-//                return NotFound(new { message = "Lien introuvable." });
-
-//            return NoContent();
-//        }
-//    }
-//}
+        [HttpDelete("unlink/{codeTypeDossier}/{codeRegime}")]
+        public async Task<IActionResult> Unlink(string codeTypeDossier, string codeRegime)
+        {
+            try
+            {
+                await _service.UnlinkAsync(codeTypeDossier, codeRegime);
+                return Ok(new { message = "Regime unlinked successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+    }
+}

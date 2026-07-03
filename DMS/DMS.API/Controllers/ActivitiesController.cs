@@ -1,4 +1,5 @@
 ﻿using DMS.DTO.DTOs;
+using DMS.Infrastructure.IServices;
 using DMS.Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace DMS.API.Controllers
     [Route("api/[controller]")]
     public class ActivitiesController : ControllerBase
     {
-        private readonly Infrastructure.IServices.IActivityService<ActivityDto> _service;
+        private readonly IActivityService<ActivityDto> _service;
 
         public ActivitiesController(Infrastructure.IServices.IActivityService<ActivityDto> service)
         {

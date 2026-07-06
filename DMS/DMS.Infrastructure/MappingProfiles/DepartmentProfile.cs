@@ -9,6 +9,8 @@ namespace DMS.Infrastructure.MappingProfiles
         public DepartmentProfile()
         {
             CreateMap<Department, DepartmentDTO>().ReverseMap();
+
+            CreateMap<TnCodesTaxis, TnCodesTaxisDTO>().ReverseMap();
         }
     }
 }

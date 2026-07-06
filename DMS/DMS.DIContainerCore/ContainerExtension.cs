@@ -43,6 +43,11 @@ namespace DMS.DIContainerCore
             // Activities
             services.AddTransient<IActivityRepository<TnActivite>, ActivityRepository>();
             services.AddTransient<IActivityService<ActivityDto>, ActivityService<ActivityDto, TnActivite, DmsReferenceContext>>();
+
+            // TnCodesTaxis (VAT / TVA)
+            services.AddTransient<ITnCodesTaxisRepository<TnCodesTaxis>, TnCodesTaxisRepository>();
+            services.AddTransient<ITnCodesTaxisService<TnCodesTaxisDTO>,
+                TnCodesTaxisService<TnCodesTaxisDTO, TnCodesTaxis, DmsReferenceContext>>();
         }
     }
 }

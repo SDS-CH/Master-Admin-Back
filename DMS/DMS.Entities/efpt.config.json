@@ -5,7 +5,7 @@
    "FilterSchemas": false,
    "IncludeConnectionString": false,
    "IrregularWords": null,
-   "MinimumProductVersion": "2.6.1248",
+   "MinimumProductVersion": "2.6.1604",
    "ModelNamespace": null,
    "OutputContextPath": null,
    "OutputPath": "Models",
@@ -1399,10 +1399,6 @@
          "ObjectType": 0
       },
       {
-         "Name": "dms_reference.tn_Codes_Taxes",
-         "ObjectType": 0
-      },
-      {
          "Name": "dms_reference.tn_Codes_Validites",
          "ObjectType": 0
       },
@@ -1579,7 +1575,7 @@
          "ObjectType": 0
       },
       {
-         "Name": "dms_reference.tn_devises_ref",
+         "Name": "dms_reference.tn_Devises_ref",
          "ObjectType": 0
       },
       {
@@ -2351,6 +2347,14 @@
          "ObjectType": 0
       },
       {
+         "Name": "dms_reference.translation_data",
+         "ObjectType": 0
+      },
+      {
+         "Name": "dms_reference.translation_field",
+         "ObjectType": 0
+      },
+      {
          "Name": "dms_reference.tx_Dossiers",
          "ObjectType": 0
       },
@@ -2617,6 +2621,10 @@
       {
          "Name": "dms_reference.WS_FileUpdates",
          "ObjectType": 0
+      },
+      {
+         "Name": "dms_reference.fn_translations_by_menu",
+         "ObjectType": 1
       }
    ],
    "UiHint": null,
@@ -2645,5 +2653,6 @@
    "UseSchemaNamespaces": false,
    "UseSpatial": false,
    "UseT4": false,
-   "UseT4Split": false
+   "UseT4Split": false,
+   "UseTypedTvpParameters": true
 }

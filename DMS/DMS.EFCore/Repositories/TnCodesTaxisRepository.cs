@@ -5,6 +5,7 @@ using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Master.Common.Classes.EFCore;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -70,9 +71,37 @@ namespace DMS.EFCore.Repositories
             return await query.ToDataSourceResultAsync(requestModel);
         }
 
-        public Task Delete(string code)
+        public async Task Delete(string code)
         {
-            throw new NotImplementedException();
+            var entity = await dbContext.TnCodesTaxes
+                .FirstOrDefaultAsync(x => x.CodeTaxe == code);
+
+            if (entity != null)
+            {
+                dbContext.TnCodesTaxes.Remove(entity);
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
+        // Accounts available for a country, resolved through:
+        // PcComptePlanComptableGroupe -> PcPlanComptableGroupe -> PcPlanComptableEntite.CountryId
+        public async Task<List<DMS.DTO.DTOs.CompteComptableOptionDTO>> GetComptesByCountry(int countryId)
+        {
+            var query = from cpg in dbContext.PcComptePlanComptableGroupes
+                        join compte in dbContext.PcCompteComptables on cpg.CompteId equals compte.Id
+                        join groupe in dbContext.PcPlanComptableGroupes on cpg.PlanComptableGroupeId equals groupe.Id
+                        join entite in dbContext.PcPlanComptableEntites on groupe.PlanComptableEntiteId equals entite.Id
+                        where entite.CountryId == countryId
+                        select new DMS.DTO.DTOs.CompteComptableOptionDTO
+                        {
+                            Compte = compte.Compte,
+                            Designation = compte.Designation
+                        };
+
+            return await query
+                .Distinct()
+                .OrderBy(x => x.Compte)
+                .ToListAsync();
         }
     }
 }

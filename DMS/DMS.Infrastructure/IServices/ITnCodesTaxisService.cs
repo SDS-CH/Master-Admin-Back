@@ -2,6 +2,7 @@ using DMS.DTO.DTOs;
 using Kendo.Mvc.UI;
 using Master.Common.Classes;
 using Master.Common.Interfaces.Services;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DMS.Infrastructure.IServices
@@ -13,5 +14,6 @@ namespace DMS.Infrastructure.IServices
         Task<OperationResult> CreateTnCodesTaxis(TEntityDTO entity);
         Task<OperationResult> EditTnCodesTaxis(TEntityDTO entity, string code);
         Task<OperationResult> RemoveTnCodesTaxis(string code);
+        Task<List<CompteComptableOptionDTO>> GetComptesByCountry(int countryId);
     }
 }

@@ -36,5 +36,9 @@ namespace DMS.API.Controllers
         [HttpPost("Delete/{code}")]
         public async Task<IActionResult> Delete(string code)
             => Ok(await _service.RemoveTnCodesTaxis(code));
+
+        [HttpPost("ComptesByCountry/{countryId}")]
+        public async Task<IActionResult> GetComptesByCountry(int countryId)
+            => Ok(await _service.GetComptesByCountry(countryId));
     }
 }

@@ -1,3 +1,7 @@
+// Disable the nullable context so non-nullable string properties are not
+// treated as implicitly [Required] by ASP.NET Core model validation
+// (these fields are optional when creating/editing a tax code).
+#nullable disable
 using System;
 
 namespace DMS.DTO.DTOs
@@ -32,7 +36,7 @@ namespace DMS.DTO.DTOs
         public bool? IsActive { get; set; }
         public Guid TenantId { get; set; }
         public int? CountryId { get; set; }
-        public string? CountryName { get; set; }
-        public string? CountryCode { get; set; }
+        public string CountryName { get; set; }
+        public string CountryCode { get; set; }
     }
 }

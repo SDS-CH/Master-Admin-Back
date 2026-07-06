@@ -20,7 +20,7 @@ namespace Master.API.Controllers
             _service = service;
         }
 
-        [HttpPost("GetAll")]
+        [HttpPost("GetAllCountries")]
         public async Task<IActionResult> GetAll([DataSourceRequest] DataSourceRequest request)
             => Ok(await _service.GetAllCountries(request));
 

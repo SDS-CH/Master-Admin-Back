@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Master.Services.Services
 {
-    public class ERPCountryService<TErpCountryDTO, TErpCountry, TContext> : BaseService<TErpCountryDTO, TErpCountry, TContext>, IErpCountryService<TErpCountryDTO>
+    public class ERPCountryService<TErpCountryDTO, TErpCountry, TContext> : BaseService<TErpCountryDTO, TErpCountry, TContext>, IErpCountryService<TErpCountryDTO>//Ici on crée une classe générique. Ça veut dire que la classe peut fonctionner avec plusieurs types.
         where TErpCountry : ErpCountries, new()
         where TErpCountryDTO : ErpCountryDTO
         where TContext : ERPMasterContext

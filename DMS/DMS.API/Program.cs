@@ -11,6 +11,8 @@ using DMS.Entities.Models;
 using DMS.EFCore.Repositories;
 using DMS.EFCore;
 using DMS.Infrastructure.IRepositories;
+using DMS.Infrastructure.IServices;
+using DMS.Services.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);

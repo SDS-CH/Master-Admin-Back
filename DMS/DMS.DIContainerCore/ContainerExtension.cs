@@ -21,6 +21,11 @@ namespace DMS.DIContainerCore
             services.AddTransient<IDepartmentRepository<Department>, DepartmentRepository>();
             services.AddTransient<IDepartmentService<DepartmentDTO>,
                 DepartmentService<DepartmentDTO, Department, DmsReferenceContext>>();
+
+            // TnCodesTaxis
+            services.AddTransient<ITnCodesTaxisRepository<TnCodesTaxis>, TnCodesTaxisRepository>();
+            services.AddTransient<ITnCodesTaxisService<TnCodesTaxisDTO>,
+                TnCodesTaxisService<TnCodesTaxisDTO, TnCodesTaxis, DmsReferenceContext>>();
         }
     }
 }

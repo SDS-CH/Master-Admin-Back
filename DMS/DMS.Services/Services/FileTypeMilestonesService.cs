@@ -2,7 +2,6 @@ using DMS.DTO.DTOs;
 using DMS.Entities.Models;
 using DMS.Infrastructure.IRepositories;
 using DMS.Infrastructure.IServices;
-using Master.Common.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,30 +49,7 @@ namespace DMS.Services.Services
 
             return await _repository.SearchMilestonesForFileTypeAsync(fileType, search);
         }
-        public async Task<OperationResult> CreateStep(AddFileTypeMilestonesDto stepsEditorDTO)
-        {
-            try
-            {
-                Guid g = Guid.NewGuid();
-                string code = String.Format(g.ToString().Replace("-", "").Substring(0, 8));
-                TnCodesEtapes existingStep = await _stepsCodesRepository.GenericGetFirstOrDefaultAsync(e => e.LibelleEtape == stepsEditorDTO.LibelleEtape);
-                if (existingStep != null)
-                {
-                    return new OperationResult { ErrorOccured = true, Message = String.Format("StepAlreadyExists", String.Join(", ", stepsEditorDTO.LibelleEtape)) };
-                }
-                TnCodesEtapes newStep = new TnCodesEtapes();
-                stepsEditorDTO.CodeEtape = code;
-                stepsEditorDTO.Session = 0;
-                stepsEditorDTO.AddNewTime = _stepsCodesRepository.ToUnspecified(DateTime.Now);
-                stepsEditorDTO.EditTime = _stepsCodesRepository.ToUnspecified(DateTime.Now);
-                await _stepsCodesRepository.Create(stepsEditorDTO.MapTo<TnCodesEtapes>(_mapper));
-                return new OperationResult(false, _translate["OperationTerminatedSuccessfully"].Value, code);
-            }
-            catch (Exception e)
-            {
-                return new OperationResult(true, e.Message);
-            }
-        }
+
 
         public async Task<string> AddMilestonesAsync(string fileTypeCode, AddFileTypeMilestonesDto dto)
         {

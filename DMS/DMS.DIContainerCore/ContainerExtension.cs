@@ -44,6 +44,10 @@ namespace DMS.DIContainerCore
             services.AddTransient<IGedDocumentCategoryRepository<GedDocumentCategory>, GedDocumentCategoryRepository>();
             services.AddTransient<IGedDocumentCategoryService<GedDocumentCategoryDto>,
                 GedDocumentCategoryService<GedDocumentCategoryDto, GedDocumentCategory, DmsReferenceContext>>();
+
+            // File Type Milestones
+            services.AddTransient<IFileTypeMilestonesRepository, FileTypeMilestonesRepository>();
+            services.AddTransient<IFileTypeMilestonesService, FileTypeMilestonesService>();
         }
     }
 }

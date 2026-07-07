@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace DMS.DTO.DTOs
 {
     public class MilestoneStepDto
@@ -6,7 +9,11 @@ namespace DMS.DTO.DTOs
         public string LibelleEtape { get; set; } = string.Empty;
         public string? CategorieEtape { get; set; }
         public int? OrdreEtape { get; set; }
-        public bool IsActive { get; set; }
+        public bool? IsActive { get; set; }
+
+        // Audit
+        public DateTime AddNewTime { get; set; }
+        public DateTime EditTime { get; set; }
     }
 
     public class FileTypeMilestoneDto : MilestoneStepDto
@@ -14,6 +21,9 @@ namespace DMS.DTO.DTOs
         public int MappingId { get; set; }
         public string FileType { get; set; } = string.Empty;
         public bool? Obligatoire { get; set; }
+
+        // Gestion du délai/avertissement, alignée sur le pattern GestionDuree/DelaiEtape
+        public bool GestionDelai { get; set; }
         public int? LimiteAvertissement { get; set; }
     }
 
@@ -33,6 +43,7 @@ namespace DMS.DTO.DTOs
     public class UpdateFileTypeMilestoneDto
     {
         public bool? Obligatoire { get; set; }
+        public bool? GestionDelai { get; set; }
         public int? LimiteAvertissement { get; set; }
     }
 }

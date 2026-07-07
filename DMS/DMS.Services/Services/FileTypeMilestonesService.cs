@@ -2,6 +2,7 @@ using DMS.DTO.DTOs;
 using DMS.Entities.Models;
 using DMS.Infrastructure.IRepositories;
 using DMS.Infrastructure.IServices;
+using Master.Common.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,152 +51,186 @@ namespace DMS.Services.Services
             return await _repository.SearchMilestonesForFileTypeAsync(fileType, search);
         }
 
-
-        public async Task<string> AddMilestonesAsync(string fileTypeCode, AddFileTypeMilestonesDto dto)
+        public async Task<OperationResult> AddMilestonesAsync(string fileTypeCode, AddFileTypeMilestonesDto dto)
         {
-            if (dto.StepCodes.Count == 0)
+            try
             {
-                return "Select at least one milestone.";
-            }
-
-            var fileType = await _repository.FindFileTypeAsync(fileTypeCode);
-            if (fileType is null)
-            {
-                return "File type not found.";
-            }
-
-            var stepCodes = dto.StepCodes
-                .Where(code => !string.IsNullOrWhiteSpace(code))
-                .Select(code => code.Trim())
-                .Distinct()
-                .ToList();
-
-            var steps = await _repository.GetStepsByCodesAsync(stepCodes, fileType.TenantId);
-            if (steps.Count == 0)
-            {
-                return "No selected milestone exists for this file type tenant.";
-            }
-
-            var existingCodes = await _repository.GetExistingMappingStepCodesAsync(fileType.CodeTypeDossier, fileType.TenantId);
-            var existingSet = existingCodes.ToHashSet();
-            var nextOrder = await _repository.GetMaxMappingOrderAsync(fileType.CodeTypeDossier, fileType.TenantId);
-
-            var newMappings = new List<TnFileTypeStep>();
-            foreach (var step in steps)
-            {
-                if (existingSet.Contains(step.CodeEtape))
+                if (dto.StepCodes.Count == 0)
                 {
-                    continue;
+                    return new OperationResult(true, "Select at least one milestone.");
                 }
 
-                nextOrder++;
-                newMappings.Add(new TnFileTypeStep
+                var fileType = await _repository.FindFileTypeAsync(fileTypeCode);
+                if (fileType is null)
                 {
-                    FileType = fileType.CodeTypeDossier,
-                    StepCode = step.CodeEtape,
-                    Obligatoire = false,
-                    LimiteAvertissement = null,
-                    OrdreEtape = nextOrder,
-                    DateAchvementObligatoire = false,
-                    ObligatoireSiRegime = null,
-                    IsFileCover = false,
-                    TenantId = fileType.TenantId
-                });
-            }
+                    return new OperationResult(true, "File type not found.");
+                }
 
-            if (newMappings.Count == 0)
-            {
-                return "Selected milestones are already mapped.";
-            }
+                var stepCodes = dto.StepCodes
+                    .Where(code => !string.IsNullOrWhiteSpace(code))
+                    .Select(code => code.Trim())
+                    .Distinct()
+                    .ToList();
 
-            await _repository.AddFileTypeStepsAsync(newMappings);
-            await _repository.SaveChangesAsync();
-            return string.Empty; // Success
-        }
-
-        public async Task<MilestoneStepDto> CreateStepAsync(string fileTypeCode, CreateMilestoneStepDto dto)
-        {
-            var fileType = await _repository.FindFileTypeAsync(fileTypeCode);
-            if (fileType is null)
-            {
-                throw new Exception("File type not found.");
-            }
-
-            var code = await GenerateStepCode(dto.LibelleEtape, fileType.TenantId);
-            var nextStepOrder = await _repository.GetMaxStepOrderAsync(fileType.TenantId) + 1;
-
-            var step = new TnCodesEtape
-            {
-                CodeEtape = code,
-                LibelleEtape = dto.LibelleEtape.Trim(),
-                CategorieEtape = string.IsNullOrWhiteSpace(dto.CategorieEtape) ? null : dto.CategorieEtape.Trim(),
-                OrdreEtape = nextStepOrder,
-                GestionDuree = false,
-                DelaiEtape = null,
-                Agence = null,
-                EtapeDossier = true,
-                Regime = null,
-                PlanAchatEtape = null,
-                Session = 0,
-                AddNewTime = DateTime.UtcNow,
-                EditTime = DateTime.UtcNow,
-                AttachedDocumentType = null,
-                TypesDocuments = null,
-                IsActive = dto.IsActive,
-                TenantId = fileType.TenantId
-            };
-
-            await _repository.AddStepAsync(step);
-
-            if (dto.IsActive)
-            {
-                var nextMappingOrder = await _repository.GetMaxMappingOrderAsync(fileType.CodeTypeDossier, fileType.TenantId) + 1;
-                await _repository.AddFileTypeStepAsync(new TnFileTypeStep
+                var steps = await _repository.GetStepsByCodesAsync(stepCodes, fileType.TenantId);
+                if (steps.Count == 0)
                 {
-                    FileType = fileType.CodeTypeDossier,
-                    StepCode = step.CodeEtape,
-                    Obligatoire = false,
-                    LimiteAvertissement = null,
-                    OrdreEtape = nextMappingOrder,
-                    DateAchvementObligatoire = false,
-                    ObligatoireSiRegime = null,
-                    IsFileCover = false,
-                    TenantId = fileType.TenantId
-                });
+                    return new OperationResult(true, "No selected milestone exists for this file type tenant.");
+                }
+
+                var existingCodes = await _repository.GetExistingMappingStepCodesAsync(fileType.CodeTypeDossier, fileType.TenantId);
+                var existingSet = existingCodes.ToHashSet();
+                var nextOrder = await _repository.GetMaxMappingOrderAsync(fileType.CodeTypeDossier, fileType.TenantId);
+
+                var newMappings = new List<TnFileTypeStep>();
+                foreach (var step in steps)
+                {
+                    if (existingSet.Contains(step.CodeEtape))
+                    {
+                        continue;
+                    }
+
+                    nextOrder++;
+                    newMappings.Add(new TnFileTypeStep
+                    {
+                        FileType = fileType.CodeTypeDossier,
+                        StepCode = step.CodeEtape,
+                        Obligatoire = false,
+                        LimiteAvertissement = null,
+                        OrdreEtape = nextOrder,
+                        DateAchvementObligatoire = false,
+                        ObligatoireSiRegime = null,
+                        IsFileCover = false,
+                        TenantId = fileType.TenantId
+                    });
+                }
+
+                if (newMappings.Count == 0)
+                {
+                    return new OperationResult(true, "Selected milestones are already mapped.");
+                }
+
+                await _repository.AddFileTypeStepsAsync(newMappings);
+                await _repository.SaveChangesAsync();
+                return new OperationResult(false, "Operation terminated successfully.");
             }
-
-            await _repository.SaveChangesAsync();
-
-            return new MilestoneStepDto
+            catch (Exception e)
             {
-                CodeEtape = step.CodeEtape,
-                LibelleEtape = step.LibelleEtape,
-                CategorieEtape = step.CategorieEtape,
-                OrdreEtape = step.OrdreEtape,
-                IsActive = step.IsActive ?? false
-            };
+                return new OperationResult(true, e.Message);
+            }
         }
 
-        public async Task<bool> UpdateMilestoneMappingAsync(int mappingId, UpdateFileTypeMilestoneDto dto)
+        public async Task<OperationResult> CreateStepAsync(string fileTypeCode, CreateMilestoneStepDto dto)
         {
-            var mapping = await _repository.GetMappingByIdAsync(mappingId);
-            if (mapping is null) return false;
+            try
+            {
+                var fileType = await _repository.FindFileTypeAsync(fileTypeCode);
+                if (fileType is null)
+                {
+                    return new OperationResult(true, "File type not found.");
+                }
 
-            mapping.Obligatoire = dto.Obligatoire;
-            mapping.LimiteAvertissement = dto.LimiteAvertissement;
+                // Vérification de doublon sur le libellé, comme dans le pattern original
+                var existingStep = await _repository.GetStepByLabelAsync(dto.LibelleEtape.Trim(), fileType.TenantId);
+                if (existingStep != null)
+                {
+                    return new OperationResult(true, $"A step already exists with the label '{dto.LibelleEtape}'.");
+                }
 
-            await _repository.SaveChangesAsync();
-            return true;
+                var code = await GenerateStepCode(dto.LibelleEtape, fileType.TenantId);
+                var nextStepOrder = await _repository.GetMaxStepOrderAsync(fileType.TenantId) + 1;
+                var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+
+                var step = new TnCodesEtape
+                {
+                    CodeEtape = code,
+                    LibelleEtape = dto.LibelleEtape.Trim(),
+                    CategorieEtape = string.IsNullOrWhiteSpace(dto.CategorieEtape) ? null : dto.CategorieEtape.Trim(),
+                    OrdreEtape = nextStepOrder,
+                    GestionDuree = false,
+                    DelaiEtape = null,
+                    Agence = null,
+                    EtapeDossier = true,
+                    Regime = null,
+                    PlanAchatEtape = null,
+                    Session = 0,
+                    AddNewTime = now,
+                    EditTime = now,
+                    AttachedDocumentType = null,
+                    TypesDocuments = null,
+                    IsActive = dto.IsActive,
+                    TenantId = fileType.TenantId
+                };
+
+                await _repository.AddStepAsync(step);
+
+                if (dto.IsActive)
+                {
+                    var nextMappingOrder = await _repository.GetMaxMappingOrderAsync(fileType.CodeTypeDossier, fileType.TenantId) + 1;
+                    await _repository.AddFileTypeStepAsync(new TnFileTypeStep
+                    {
+                        FileType = fileType.CodeTypeDossier,
+                        StepCode = step.CodeEtape,
+                        Obligatoire = false,
+                        LimiteAvertissement = null,
+                        OrdreEtape = nextMappingOrder,
+                        DateAchvementObligatoire = false,
+                        ObligatoireSiRegime = null,
+                        IsFileCover = false,
+                        TenantId = fileType.TenantId
+                    });
+                }
+
+                await _repository.SaveChangesAsync();
+
+                return new OperationResult(false, "Operation terminated successfully.", step.CodeEtape);
+            }
+            catch (Exception e)
+            {
+                return new OperationResult(true, e.Message);
+            }
         }
 
-        public async Task<bool> DeleteMilestoneMappingAsync(int mappingId)
+        public async Task<OperationResult> UpdateMilestoneMappingAsync(int mappingId, UpdateFileTypeMilestoneDto dto)
         {
-            var mapping = await _repository.GetMappingByIdAsync(mappingId);
-            if (mapping is null) return false;
+            try
+            {
+                var mapping = await _repository.GetMappingByIdAsync(mappingId);
+                if (mapping is null)
+                {
+                    return new OperationResult(true, "Milestone mapping not found.");
+                }
 
-            _repository.RemoveFileTypeStep(mapping);
-            await _repository.SaveChangesAsync();
-            return true;
+                mapping.Obligatoire = dto.Obligatoire;
+                mapping.LimiteAvertissement = dto.LimiteAvertissement;
+
+                await _repository.SaveChangesAsync();
+                return new OperationResult(false, "Operation terminated successfully.");
+            }
+            catch (Exception e)
+            {
+                return new OperationResult(true, e.Message);
+            }
+        }
+
+        public async Task<OperationResult> DeleteMilestoneMappingAsync(int mappingId)
+        {
+            try
+            {
+                var mapping = await _repository.GetMappingByIdAsync(mappingId);
+                if (mapping is null)
+                {
+                    return new OperationResult(true, "Milestone mapping delete error.");
+                }
+
+                _repository.RemoveFileTypeStep(mapping);
+                await _repository.SaveChangesAsync();
+                return new OperationResult(false, "Operation terminated successfully.");
+            }
+            catch (Exception)
+            {
+                return new OperationResult(true, "Milestone mapping delete error.");
+            }
         }
 
         private async Task<string> GenerateStepCode(string label, Guid tenantId)

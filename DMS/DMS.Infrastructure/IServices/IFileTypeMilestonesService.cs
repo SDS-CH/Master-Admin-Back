@@ -1,16 +1,25 @@
-using DMS.DTO.DTOs;
+using ERP.Common.Classes.CommonDTOs;
+using ERP.Common.Interfaces.Services;
+using Kendo.Mvc.UI;
+using Master.Common.Classes;
+using Master.Common.Interfaces.Services;
+using OIC.DTO;
+using OIC.DTO.File;
+using OIC.DTO.MasterDataOperation;
+using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace DMS.Infrastructure.IServices
+namespace OIC.Infrastructure.IServices.MasterDataOperation
 {
-    public interface IFileTypeMilestonesService
+    public interface IStepsCodesService<TEntityDTO> : IBaseService<TEntityDTO> where TEntityDTO : StepsCodesDTO
     {
-        Task<List<FileTypeMilestoneDto>?> GetMappedMilestonesAsync(string fileTypeCode);
-        Task<List<MilestoneStepDto>?> SearchMilestonesAsync(string fileTypeCode, string? search);
-        Task<string> AddMilestonesAsync(string fileTypeCode, AddFileTypeMilestonesDto dto);
-        Task<MilestoneStepDto> CreateStepAsync(string fileTypeCode, CreateMilestoneStepDto dto);
-        Task<bool> UpdateMilestoneMappingAsync(int mappingId, UpdateFileTypeMilestoneDto dto);
-        Task<bool> DeleteMilestoneMappingAsync(int mappingId);
+        Task<DataSourceResult> ReadAllSteps(DataSourceRequest requestModel);
+        Task<OperationResult> DeleteStepsCodes(string code);
+        Task<OperationResult> CreateStep(StepsCodesDTO stepsEditorDTO);
+        Task<OperationResult> EditStep(StepsCodesDTO stepsEditorDTO);
+        Task<DataSourceResult> ReadFileStepCode([DataSourceRequest] DataSourceRequest requestModel, StepsCodesDTO fileFilter);
+
     }
 }

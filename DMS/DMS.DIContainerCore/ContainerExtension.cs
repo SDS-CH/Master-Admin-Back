@@ -40,6 +40,11 @@ namespace DMS.DIContainerCore
             // CustomFields
             services.AddTransient<ICustomFieldRepository<TnCodesComplementsDossier>, CustomFieldRepository>();
             services.AddTransient<ICustomFieldService<CustomFieldDto>, CustomFieldService<CustomFieldDto, TnCodesComplementsDossier, DmsReferenceContext>>();
+
+            // TnCodesTaxis (VAT / TVA)
+            services.AddTransient<ITnCodesTaxisRepository<TnCodesTaxis>, TnCodesTaxisRepository>();
+            services.AddTransient<ITnCodesTaxisService<TnCodesTaxisDTO>,
+                TnCodesTaxisService<TnCodesTaxisDTO, TnCodesTaxis, DmsReferenceContext>>();
         }
     }
 }

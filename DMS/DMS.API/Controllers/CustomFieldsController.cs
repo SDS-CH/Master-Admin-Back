@@ -6,11 +6,11 @@ namespace DMS.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RegimesController : ControllerBase
+    public class CustomFieldsController : ControllerBase
     {
-        private readonly IRegimeService<RegimeDto> _service;
+        private readonly ICustomFieldService<CustomFieldDto> _service;
 
-        public RegimesController(IRegimeService<RegimeDto> service)
+        public CustomFieldsController(ICustomFieldService<CustomFieldDto> service)
         {
             _service = service;
         }
@@ -29,13 +29,20 @@ namespace DMS.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("types")]
+        public IActionResult GetAvailableTypes()
+        {
+            var types = _service.GetAvailableTypes();
+            return Ok(types);
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Create(CreateRegimeDto dto)
+        public async Task<IActionResult> Create(CreateCustomFieldDto dto)
         {
             try
             {
                 await _service.CreateAsync(dto);
-                return Ok(new { message = "Regime created successfully" });
+                return Ok(new { message = "Custom Field created successfully" });
             }
             catch (Exception ex)
             {
@@ -49,12 +56,12 @@ namespace DMS.API.Controllers
         }
 
         [HttpPost("link")]
-        public async Task<IActionResult> Link(LinkRegimeDto dto)
+        public async Task<IActionResult> Link(LinkCustomFieldDto dto)
         {
             try
             {
                 await _service.LinkAsync(dto);
-                return Ok(new { message = "Regime(s) linked successfully" });
+                return Ok(new { message = "Custom Field(s) linked successfully" });
             }
             catch (Exception ex)
             {
@@ -62,13 +69,20 @@ namespace DMS.API.Controllers
             }
         }
 
-        [HttpDelete("unlink/{codeTypeDossier}/{codeRegime}")]
-        public async Task<IActionResult> Unlink(string codeTypeDossier, string codeRegime)
+        [HttpPut("{codeTypeDossier}/{complementCode}")]
+        public async Task<IActionResult> UpdateIsRequired(string codeTypeDossier, string complementCode, [FromBody] bool isRequiredOnFileClosure)
+        {
+            var updated = await _service.UpdateIsRequiredAsync(codeTypeDossier, complementCode, isRequiredOnFileClosure);
+            return updated ? Ok(new { message = "Updated successfully" }) : NotFound();
+        }
+
+        [HttpDelete("unlink/{codeTypeDossier}/{complementCode}")]
+        public async Task<IActionResult> Unlink(string codeTypeDossier, string complementCode)
         {
             try
             {
-                await _service.UnlinkAsync(codeTypeDossier, codeRegime);
-                return Ok(new { message = "Regime unlinked successfully" });
+                await _service.UnlinkAsync(codeTypeDossier, complementCode);
+                return Ok(new { message = "Custom Field unlinked successfully" });
             }
             catch (Exception ex)
             {

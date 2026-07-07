@@ -14,7 +14,7 @@ using Newtonsoft.Json.Serialization;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
+ 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
@@ -90,14 +90,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<DmsReferenceContext>();
-    db.Database.ExecuteSqlRaw("""
-        ALTER TABLE dms_reference."GED_DocumentType"
-        ADD COLUMN IF NOT EXISTS "industryId" integer;
-        """);
-}
 
 if (app.Environment.IsDevelopment())
 {

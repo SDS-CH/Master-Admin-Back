@@ -1,19 +1,20 @@
-﻿//using DMS.DTO.DTOs;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using DMS.DTO.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Master.Common.Interfaces.Services;
 
-//namespace DMS.Infrastructure.IServices
-//{
-//    public interface IRegimeService
-//    {
-//        Task<List<RegimeDto>> GetRegimesByFileTypeAsync(string fileTypeCode);
-//        Task<List<RegimeDto>> GetAvailableRegimesAsync(string fileTypeCode);
-//        Task<RegimeDto> CreateRegimeAndLinkAsync(CreateRegimeDto dto);
-//        Task<RegimeDto?> UpdateRegimeAsync(string regimeCode, UpdateRegimeDto dto);
-//        Task LinkRegimeAsync(LinkRegimeDto dto);
-//        Task<bool> UnlinkRegimeAsync(string fileTypeCode, string regimeCode);
-//    }
-//}
+
+namespace DMS.Infrastructure.IServices
+{
+    public interface IRegimeService<TEntityDTO> : IBaseService<TEntityDTO> where TEntityDTO : RegimeDto
+    {
+        Task<List<RegimeDto>> GetAllAsync();
+        Task<List<RegimeDto>> GetByFileTypeAsync(string codeTypeDossier);
+        Task CreateAsync(CreateRegimeDto dto);
+        Task LinkAsync(LinkRegimeDto dto);
+        Task UnlinkAsync(string codeTypeDossier, string codeRegime);
+    }
+}

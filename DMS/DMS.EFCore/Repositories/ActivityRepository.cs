@@ -28,20 +28,29 @@ namespace DMS.EFCore.Repositories
             return await query.OrderBy(a => a.CodeActivite).ToListAsync();
         }
 
-       
-
         public async Task<TnActivite?> UpdateActivity(string codeActivite, Guid tenantId, TnActivite activity)
         {
             var existing = await dbContext.TnActivites.FindAsync(codeActivite, tenantId);
-
             if (existing is null)
             {
                 return null;
             }
 
             existing.LibelleActivite = activity.LibelleActivite;
-            existing.ModuleOperation = activity.ModuleOperation;
-            existing.ConcernFacturation = activity.ConcernFacturation;
+
+            // Ne pas écraser ModuleOperation si le frontend n'envoie rien
+            // (évite la violation de contrainte FK vers tn_Modules_Operations)
+            if (!string.IsNullOrWhiteSpace(activity.ModuleOperation))
+            {
+                existing.ModuleOperation = activity.ModuleOperation;
+            }
+
+            // Même logique de préservation pour ConcernFacturation
+            if (!string.IsNullOrWhiteSpace(activity.ConcernFacturation))
+            {
+                existing.ConcernFacturation = activity.ConcernFacturation;
+            }
+
             existing.Session = activity.Session;
             existing.EditTime = activity.EditTime;
             existing.IndustryId = activity.IndustryId;

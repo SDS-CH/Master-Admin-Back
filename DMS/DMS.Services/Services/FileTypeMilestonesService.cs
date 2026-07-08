@@ -2,7 +2,9 @@ using DMS.DTO.DTOs;
 using DMS.Entities.Models;
 using DMS.Infrastructure.IRepositories;
 using DMS.Infrastructure.IServices;
+using Kendo.Mvc.UI;
 using Master.Common.Classes;
+using OIC.Infrastructure.IServices.MasterDataOperation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +15,20 @@ namespace DMS.Services.Services
 {
     public class FileTypeMilestonesService : IFileTypeMilestonesService
     {
-        private readonly IFileTypeMilestonesRepository _repository;
+        private readonly IFileTypeMilestonesRepository<TnCodesEtape> _repository;
 
-        public FileTypeMilestonesService(IFileTypeMilestonesRepository repository)
+        public FileTypeMilestonesService(IFileTypeMilestonesRepository<TnCodesEtape> repository)
         {
             _repository = repository;
+        }
+
+        // --- Nouvelle méthode : pagination/tri/filtrage Kendo pour les jalons mappés ---
+        public async Task<DataSourceResult?> GetAllMappedMilestonesAsync(string fileTypeCode, DataSourceRequest requestModel)
+        {
+            var fileType = await _repository.FindFileTypeAsync(fileTypeCode);
+            if (fileType is null) return null;
+
+            return await _repository.GetAllMappedMilestones(requestModel, fileType);
         }
 
         public async Task<List<FileTypeMilestoneDto>?> GetMappedMilestonesAsync(string fileTypeCode)
@@ -28,25 +39,19 @@ namespace DMS.Services.Services
             return await _repository.GetMappedMilestonesAsync(fileType);
         }
 
+        // --- Nouvelle méthode : pagination/tri/filtrage Kendo pour la recherche de jalons ---
+        public async Task<DataSourceResult?> SearchMilestonesAsync(string fileTypeCode, DataSourceRequest requestModel, MilestoneStepDto filter)
+        {
+            var fileType = await ResolveOrBuildFallbackFileTypeAsync(fileTypeCode);
+            if (fileType is null) return null;
+
+            return await _repository.SearchMilestonesForFileType(requestModel, fileType, filter);
+        }
+
         public async Task<List<MilestoneStepDto>?> SearchMilestonesAsync(string fileTypeCode, string? search)
         {
-            var normalizedCode = fileTypeCode.Trim().ToUpper();
-            var fileType = await _repository.FindFileTypeAsync(fileTypeCode);
-
-            if (fileType is null)
-            {
-                var fallbackTenant = await _repository.FindFallbackTenantAsync(normalizedCode);
-                if (fallbackTenant is null)
-                {
-                    return null;
-                }
-
-                fileType = new TnTypesDossier
-                {
-                    CodeTypeDossier = fileTypeCode.Trim(),
-                    TenantId = fallbackTenant.Value
-                };
-            }
+            var fileType = await ResolveOrBuildFallbackFileTypeAsync(fileTypeCode);
+            if (fileType is null) return null;
 
             return await _repository.SearchMilestonesForFileTypeAsync(fileType, search);
         }
@@ -231,6 +236,24 @@ namespace DMS.Services.Services
             {
                 return new OperationResult(true, "Milestone mapping delete error.");
             }
+        }
+
+        // --- Factorisation : logique de résolution du type de dossier (avec fallback tenant) ---
+        private async Task<TnTypesDossier?> ResolveOrBuildFallbackFileTypeAsync(string fileTypeCode)
+        {
+            var normalizedCode = fileTypeCode.Trim().ToUpper();
+            var fileType = await _repository.FindFileTypeAsync(fileTypeCode);
+
+            if (fileType is not null) return fileType;
+
+            var fallbackTenant = await _repository.FindFallbackTenantAsync(normalizedCode);
+            if (fallbackTenant is null) return null;
+
+            return new TnTypesDossier
+            {
+                CodeTypeDossier = fileTypeCode.Trim(),
+                TenantId = fallbackTenant.Value
+            };
         }
 
         private async Task<string> GenerateStepCode(string label, Guid tenantId)

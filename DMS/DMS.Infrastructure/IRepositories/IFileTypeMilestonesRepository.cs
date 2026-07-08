@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DMS.Infrastructure.IRepositories
 {
-    public interface IFileTypeMilestonesRepository
+    public interface IFileTypeMilestonesRepository 
     {
         Task<TnTypesDossier?> FindFileTypeAsync(string fileTypeCode);
 

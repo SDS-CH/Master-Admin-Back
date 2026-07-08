@@ -148,5 +148,11 @@ namespace DMS.Services.Services
 
             return normalized[..Math.Min(normalized.Length, 10)];
         }
+
+        public Task<TActivityDTO> GetById(int id)
+        {
+            return _repository.GetById(id)
+                .ContinueWith(task => _mapper.Map<TActivityDTO>(task.Result));
+        }
     }
 }

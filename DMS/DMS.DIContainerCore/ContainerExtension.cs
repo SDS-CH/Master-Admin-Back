@@ -47,8 +47,9 @@ namespace DMS.DIContainerCore
                 GedDocumentCategoryService<GedDocumentCategoryDto, GedDocumentCategory, DmsReferenceContext>>();
 
             // File Type Milestones
-            services.AddTransient<IFileTypeMilestonesRepository, FileTypeMilestonesRepository<TnF>();
-            services.AddTransient<IFileTypeMilestonesService<>, FileTypeMilestonesService>();
+            services.AddTransient<IFileTypeMilestonesRepository<TnCodesEtape>, FileTypeMilestonesRepository>();
+            services.AddTransient<IFileTypeMilestonesService<MilestoneStepDto>,
+                FileTypeMilestonesService<MilestoneStepDto, TnCodesEtape, DmsReferenceContext>>();
             // TnCodesTaxis (VAT / TVA)
             services.AddTransient<ITnCodesTaxisRepository<TnCodesTaxis>, TnCodesTaxisRepository>();
             services.AddTransient<ITnCodesTaxisService<TnCodesTaxisDTO>,

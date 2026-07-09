@@ -1,13 +1,15 @@
 using DMS.DTO.DTOs;
 using DMS.Entities.Models;
 using Kendo.Mvc.UI;
+using Master.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DMS.Infrastructure.IRepositories
 {
-    public interface IFileTypeMilestonesRepository 
+    public interface IFileTypeMilestonesRepository<TEntity> : IGenericBaseRepository<TEntity>
+        where TEntity : TnCodesEtape
     {
         Task<TnTypesDossier?> FindFileTypeAsync(string fileTypeCode);
 
@@ -31,6 +33,7 @@ namespace DMS.Infrastructure.IRepositories
         Task AddFileTypeStepAsync(TnFileTypeStep mapping);
         Task<TnFileTypeStep?> GetMappingByIdAsync(int mappingId);
         Task<bool> StepCodeExistsAsync(string code, Guid tenantId);
+        Task<TnCodesEtape?> GetStepByLabelAsync(string libelle, Guid tenantId);
         void RemoveFileTypeStep(TnFileTypeStep mapping);
         Task SaveChangesAsync();
     }

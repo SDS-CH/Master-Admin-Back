@@ -1,5 +1,6 @@
 using DMS.DTO.DTOs;
 using DMS.Infrastructure.IServices;
+using Master.Common.Classes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,9 +12,9 @@ namespace DMS.API.Controllers
     [Route("api/FileTypes")]
     public class FileTypeMilestonesController : ControllerBase
     {
-        private readonly IFileTypeMilestonesService _service;
+        private readonly IFileTypeMilestonesService<MilestoneStepDto> _service;
 
-        public FileTypeMilestonesController(IFileTypeMilestonesService service)
+        public FileTypeMilestonesController(IFileTypeMilestonesService<MilestoneStepDto> service)
         {
             _service = service;
         }
@@ -54,16 +55,8 @@ namespace DMS.API.Controllers
         [HttpPost("{fileTypeCode}/milestones")]
         public async Task<IActionResult> AddMilestones(string fileTypeCode, [FromBody] AddFileTypeMilestonesDto dto)
         {
-            var error = await _service.AddMilestonesAsync(fileTypeCode, dto);
-            if (!string.IsNullOrEmpty(error))
-            {
-                if (error.Contains("already mapped"))
-                {
-                    return Ok(new { message = error });
-                }
-                return BadRequest(new { message = error });
-            }
-            return Ok(new { message = "Milestones added successfully." });
+            var result = await _service.AddMilestonesAsync(fileTypeCode, dto);
+            return ToActionResult(result);
         }
 
         [HttpPost("{fileTypeCode}/milestones/steps")]
@@ -74,37 +67,39 @@ namespace DMS.API.Controllers
                 return BadRequest(new { message = "Step label is required." });
             }
 
-            try
-            {
-                var result = await _service.CreateStepAsync(fileTypeCode, dto);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = ex.GetBaseException().Message });
-            }
+            var result = await _service.CreateStepAsync(fileTypeCode, dto);
+            return ToActionResult(result);
         }
 
         [HttpPut("milestones/{mappingId}")]
         public async Task<IActionResult> UpdateMilestoneMapping(int mappingId, [FromBody] UpdateFileTypeMilestoneDto dto)
         {
-            var success = await _service.UpdateMilestoneMappingAsync(mappingId, dto);
-            if (!success)
-            {
-                return NotFound(new { message = "Milestone mapping not found." });
-            }
-            return Ok(new { message = "Milestone mapping updated successfully." });
+            var result = await _service.UpdateMilestoneMappingAsync(mappingId, dto);
+            return ToActionResult(result);
         }
 
         [HttpDelete("milestones/{mappingId}")]
         public async Task<IActionResult> DeleteMilestoneMapping(int mappingId)
         {
-            var success = await _service.DeleteMilestoneMappingAsync(mappingId);
-            if (!success)
+            var result = await _service.DeleteMilestoneMappingAsync(mappingId);
+            return ToActionResult(result);
+        }
+
+        // Mappe un OperationResult vers la réponse HTTP appropriée
+        private IActionResult ToActionResult(OperationResult result)
+        {
+            if (!result.ErrorOccured)
             {
-                return NotFound(new { message = "Milestone mapping not found." });
+                return Ok(result);
             }
-            return Ok(new { message = "Milestone unmapped successfully." });
+
+            if (!string.IsNullOrEmpty(result.Message) &&
+                result.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+            {
+                return NotFound(result);
+            }
+
+            return BadRequest(result);
         }
     }
 }

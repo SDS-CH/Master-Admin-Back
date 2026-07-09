@@ -1,17 +1,13 @@
-﻿using DMS.Entities.Models;
+﻿#nullable disable
+using DMS.Entities.Models;
 using DMS.Infrastructure.IRepositories;
+using Master.Common.Classes.EFCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-
-#nullable disable
-using DMS.Entities.Models;
-using DMS.Infrastructure.IRepositories;
-using Master.Common.Classes.EFCore;
-using Microsoft.EntityFrameworkCore;
 
 namespace DMS.EFCore.Repositories
 {
@@ -54,7 +50,7 @@ namespace DMS.EFCore.Repositories
             var tenantId = existingRecord?.TenantId ?? Guid.Empty;
 
             await dbContext.Database.ExecuteSqlRawAsync(
-                $"SET LOCAL app.tenant_id = '{tenantId}'");
+                "SELECT set_config('app.tenant_id', {0}, true)", tenantId.ToString());
 
             regime.TenantId = tenantId;
 
@@ -78,7 +74,7 @@ namespace DMS.EFCore.Repositories
             var tenantId = existingRecord?.TenantId ?? Guid.Empty;
 
             await dbContext.Database.ExecuteSqlRawAsync(
-                $"SET LOCAL app.tenant_id = '{tenantId}'");
+                "SELECT set_config('app.tenant_id', {0}, true)", tenantId.ToString());
 
             var link = new TnFileTypeRegime
             {

@@ -49,7 +49,7 @@ namespace DMS.EFCore.Repositories
             var tenantId = existingRecord?.TenantId ?? Guid.Empty;
 
             await dbContext.Database.ExecuteSqlRawAsync(
-                $"SET LOCAL app.tenant_id = '{tenantId}'");
+                "SELECT set_config('app.tenant_id', {0}, true)", tenantId.ToString());
 
             customField.TenantId = tenantId;
 
@@ -73,7 +73,7 @@ namespace DMS.EFCore.Repositories
             var tenantId = existingRecord?.TenantId ?? Guid.Empty;
 
             await dbContext.Database.ExecuteSqlRawAsync(
-                $"SET LOCAL app.tenant_id = '{tenantId}'");
+                "SELECT set_config('app.tenant_id', {0}, true)", tenantId.ToString());
 
             var link = new TnFileComplementsRequiredOption
             {

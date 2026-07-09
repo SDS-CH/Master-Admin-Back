@@ -41,6 +41,14 @@ namespace DMS.DIContainerCore
             services.AddTransient<ICustomFieldRepository<TnCodesComplementsDossier>, CustomFieldRepository>();
             services.AddTransient<ICustomFieldService<CustomFieldDto>, CustomFieldService<CustomFieldDto, TnCodesComplementsDossier, DmsReferenceContext>>();
 
+            // GedDocumentCategory
+            services.AddTransient<IGedDocumentCategoryRepository<GedDocumentCategory>, GedDocumentCategoryRepository>();
+            services.AddTransient<IGedDocumentCategoryService<GedDocumentCategoryDto>,
+                GedDocumentCategoryService<GedDocumentCategoryDto, GedDocumentCategory, DmsReferenceContext>>();
+
+            // File Type Milestones
+            services.AddTransient<IFileTypeMilestonesRepository, FileTypeMilestonesRepository<TnF>();
+            services.AddTransient<IFileTypeMilestonesService<>, FileTypeMilestonesService>();
             // TnCodesTaxis (VAT / TVA)
             services.AddTransient<ITnCodesTaxisRepository<TnCodesTaxis>, TnCodesTaxisRepository>();
             services.AddTransient<ITnCodesTaxisService<TnCodesTaxisDTO>,

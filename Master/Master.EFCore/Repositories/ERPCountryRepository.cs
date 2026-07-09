@@ -17,7 +17,7 @@ namespace Master.EFCore.Repositories
 
         public async Task<DataSourceResult> GetAllCountries(DataSourceRequest requestModel)
         {
-            return await dbContext.ErpCountries.Where(p=>p.IsActive==true).ToDataSourceResultAsync(requestModel);//va retourner seulement la page demandée.
+            return await dbContext.ErpCountries.ToDataSourceResultAsync(requestModel);
         }
     }
 }

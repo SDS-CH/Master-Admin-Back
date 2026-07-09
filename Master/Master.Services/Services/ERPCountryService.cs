@@ -73,5 +73,27 @@ namespace Master.Services.Services
         {
             return await _repository.GetAllCountries(requestModel);
         }
+        public async Task<OperationResult> ToggleCountryStatus(int id, bool isActive)
+        {
+            try
+            {
+                // 1. Fetch data through the service/repository bounds
+                var countryDto = await GetById(id);
+                if (countryDto == null)
+                {
+                    return new OperationResult(true, "Country not found.");
+                }
+
+                // 2. Business rule evaluation and state updates live safely here
+                countryDto.IsActive = countryDto.IsActive != isActive ? isActive : !countryDto.IsActive;
+
+                // 3. Persist the change through the standard underlying repository layers
+                return await EditCountry(countryDto, id);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult(true, ex.Message);
+            }
+        }
     }
 }

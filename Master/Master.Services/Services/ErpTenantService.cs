@@ -35,14 +35,28 @@ namespace Master.Services.Services
         {
             try
             {
-                await Create(tenant, _tenantRepository);
-                return new OperationResult(false, "Tenant created successfully.");
+                if (tenant.TenantId == Guid.Empty)
+                {
+                    tenant.TenantId = Guid.NewGuid();
+                }
+
+                if (tenant.AddNewTime == default)
+                {
+                    tenant.AddNewTime = DateTime.UtcNow;
+                }
+
+                var createdEntity = await base.Create(tenant, _tenantRepository);
+
+                return new OperationResult { ErrorOccured = false, Data = createdEntity };
             }
             catch (Exception ex)
             {
-                return new OperationResult(true, ex.Message);
+                return new OperationResult { ErrorOccured = true, Message = ex.Message };
             }
         }
+
+
+       
 
         public async Task<DataSourceResult> GetAllTenants(DataSourceRequest requestModel)
         {

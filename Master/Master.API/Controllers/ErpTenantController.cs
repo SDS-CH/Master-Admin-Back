@@ -1,7 +1,9 @@
 #nullable disable
 using Kendo.Mvc.UI;
+using Master.Common.Classes;
 using Master.DTO.DTOs;
 using Master.Infrastructure.IServices;
+using Master.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -21,17 +23,20 @@ namespace Master.API.Controllers
         }
 
         [HttpPost("GetAll")]
-        public async Task<IActionResult> GetAll([DataSourceRequest] DataSourceRequest request)
-            => Ok(await _service.GetAllTenants(request));
+        public async Task<DataSourceResult> GetAll([FromBody] DataSourceRequest request)
+         => await _service.GetAllTenants(request);
 
         [HttpPost("GetById/{id}")]
         public async Task<IActionResult> GetById(int id)
             => Ok(await _service.GetById(id));
 
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] ErpTenantDTO dto)
-            => Ok(await _service.CreateTenant(dto));
+        public async Task<OperationResult> CreateTenant([FromBody] ErpTenantDTO tenantDto)
+        {
+            var result = await _service.CreateTenant(tenantDto);
 
+            return result;
+        }
         [HttpPost("Edit")]
         public async Task<IActionResult> Edit([FromBody] ErpTenantDTO dto)
             => Ok(await _service.EditTenant(dto, dto.Id));

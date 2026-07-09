@@ -16,7 +16,7 @@ namespace Master.Infrastructure.MappingProfiles
             CreateMap<ErpTenantDTO, ErpTenants>()
                 .ForMember(dest => dest.AddNewTime,
                     opt => opt.MapFrom(src => DateOnly.FromDateTime(
-                        src.AddNewTime == default ? DateTime.UtcNow : src.AddNewTime)));
+                        src.AddNewTime.HasValue ? src.AddNewTime.Value : DateTime.UtcNow)));
         }
     }
 }

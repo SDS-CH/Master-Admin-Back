@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Master.DTO.DTOs
 {
@@ -29,6 +30,6 @@ namespace Master.DTO.DTOs
         public DateTime? LastCodeGeneratedTime { get; set; }
         public DateTime? LastPasswordChangeDate { get; set; }
         public bool IsErpUser { get; set; }
-        public IEnumerable<ErpUserTenantDTO> Tenants { get; set; }
+        public List<ErpUserTenantDTO> Tenants { get; set; } = new List<ErpUserTenantDTO>();
     }
 }

@@ -21,8 +21,8 @@ namespace Master.API.Controllers
         }
 
         [HttpPost("GetAll")]
-        public async Task<IActionResult> GetAll([DataSourceRequest] DataSourceRequest request)
-            => Ok(await _service.GetAllDbInstances(request));
+        public async Task<DataSourceResult> GetAll([DataSourceRequest] DataSourceRequest request)
+            => await _service.GetAllDbInstances(request);
 
         [HttpPost("GetById/{id}")]
         public async Task<IActionResult> GetById(int id)

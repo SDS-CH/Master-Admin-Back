@@ -20,13 +20,11 @@ namespace DMS.Services.Services
         where TContext : DmsReferenceContext
     {
         private readonly IArticleRepository<TArticle> _repository;
-        private readonly IMapper _mapper;
 
         public ArticleService(TContext dbContext, IMapper mapper, IArticleRepository<TArticle> repository)
             : base(dbContext, mapper)
         {
             _repository = repository;
-            _mapper = mapper;
         }
 
        

@@ -1,10 +1,11 @@
+using AutoMapper;
 using DMS.DTO.DTOs;
 using DMS.Entities.Models;
 using DMS.Infrastructure.IRepositories;
 using DMS.Infrastructure.IServices;
 using Kendo.Mvc.UI;
 using Master.Common.Classes;
-using OIC.Infrastructure.IServices.MasterDataOperation;
+using Master.Common.Classes.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +14,24 @@ using System.Threading.Tasks;
 
 namespace DMS.Services.Services
 {
-    public class FileTypeMilestonesService : IFileTypeMilestonesService
+    public class FileTypeMilestonesService<TEntityDTO, TEntity, TContext>
+        : BaseService<TEntityDTO, TEntity, TContext>, IFileTypeMilestonesService<TEntityDTO>
+        where TEntity : TnCodesEtape, new()
+        where TEntityDTO : MilestoneStepDto
+        where TContext : DmsReferenceContext
     {
-        private readonly IFileTypeMilestonesRepository<TnCodesEtape> _repository;
+        private readonly IFileTypeMilestonesRepository<TEntity> _repository;
 
-        public FileTypeMilestonesService(IFileTypeMilestonesRepository<TnCodesEtape> repository)
+        public FileTypeMilestonesService(TContext dbContext, IMapper mapper, IFileTypeMilestonesRepository<TEntity> repository)
+            : base(dbContext, mapper)
         {
             _repository = repository;
+        }
+
+        public Task<TEntityDTO> GetById(int id)
+        {
+            return _repository.GetById(id)
+                .ContinueWith(task => _mapper.Map<TEntityDTO>(task.Result));
         }
 
         // --- Nouvelle méthode : pagination/tri/filtrage Kendo pour les jalons mappés ---
@@ -112,7 +124,8 @@ namespace DMS.Services.Services
 
                 if (newMappings.Count == 0)
                 {
-                    return new OperationResult(true, "Selected milestones are already mapped.");
+                    // No-op bénin : les jalons sélectionnés sont déjà mappés → succès (HTTP 200)
+                    return new OperationResult(false, "Selected milestones are already mapped.");
                 }
 
                 await _repository.AddFileTypeStepsAsync(newMappings);

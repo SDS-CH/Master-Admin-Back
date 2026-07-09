@@ -62,7 +62,7 @@ namespace DMS.EFCore.Repositories
 
                 // SET le tenant_id dans la session PostgreSQL
                 await dbContext.Database.ExecuteSqlRawAsync(
-                    $"SET LOCAL app.tenant_id = '{tenantId}'");
+                    "SELECT set_config('app.tenant_id', {0}, true)", tenantId.ToString());
 
                 // Appliquer le tenant_id aux deux entités
                 fileType.TenantId = tenantId;

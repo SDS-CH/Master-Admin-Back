@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Master.Services.Services
 {
-    public class ERPCountryService<TErpCountryDTO, TErpCountry, TContext> : BaseService<TErpCountryDTO, TErpCountry, TContext>, IErpCountryService<TErpCountryDTO>
+    public class ERPCountryService<TErpCountryDTO, TErpCountry, TContext> : BaseService<TErpCountryDTO, TErpCountry, TContext>, IErpCountryService<TErpCountryDTO>//Ici on crée une classe générique. Ça veut dire que la classe peut fonctionner avec plusieurs types.
         where TErpCountry : ErpCountries, new()
         where TErpCountryDTO : ErpCountryDTO
         where TContext : ERPMasterContext
@@ -72,6 +72,28 @@ namespace Master.Services.Services
         public async Task<DataSourceResult> GetAllCountries(DataSourceRequest requestModel)
         {
             return await _repository.GetAllCountries(requestModel);
+        }
+        public async Task<OperationResult> ToggleCountryStatus(int id, bool isActive)
+        {
+            try
+            {
+                // 1. Fetch data through the service/repository bounds
+                var countryDto = await GetById(id);
+                if (countryDto == null)
+                {
+                    return new OperationResult(true, "Country not found.");
+                }
+
+                // 2. Business rule evaluation and state updates live safely here
+                countryDto.IsActive = countryDto.IsActive != isActive ? isActive : !countryDto.IsActive;
+
+                // 3. Persist the change through the standard underlying repository layers
+                return await EditCountry(countryDto, id);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult(true, ex.Message);
+            }
         }
     }
 }

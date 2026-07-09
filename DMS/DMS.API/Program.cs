@@ -1,19 +1,20 @@
 using DMS.DIContainerCore;
+using DMS.DTO.DTOs;
+using DMS.EFCore.Repositories;
+using DMS.Entities.Models;
+using DMS.Infrastructure.IRepositories;
+using DMS.Infrastructure.IServices;
 using DMS.Infrastructure.MappingProfiles;
+using DMS.Services.Services;
 using Master.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using System.Text;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using DMS.Entities.Models;
-using DMS.EFCore;
-using DMS.EFCore.Repositories;
-using DMS.Infrastructure.IRepositories;
 
 var builder = WebApplication.CreateBuilder(args);
-
+ 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
@@ -34,13 +35,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-
+var connectionString = builder.Configuration.GetConnectionString("DmsReference");
 ContainerExtension.Initialize(builder.Services, connectionString!);
 
-
-builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DepartmentProfile), typeof(ArticleProfile)));
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DepartmentProfile)));
 builder.Services.AddKendo();
 
 builder.Services.AddControllers()
@@ -92,6 +90,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -103,5 +102,4 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();

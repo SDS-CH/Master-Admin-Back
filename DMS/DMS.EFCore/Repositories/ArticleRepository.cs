@@ -45,7 +45,8 @@ namespace DMS.EFCore.Repositories
         {
             var tenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
             using var transaction = await dbContext.Database.BeginTransactionAsync();
-            await dbContext.Database.ExecuteSqlRawAsync($"SET LOCAL app.tenant_id = '{tenantId}'");
+            await dbContext.Database.ExecuteSqlRawAsync(
+                "SELECT set_config('app.tenant_id', {0}, true)", tenantId.ToString());
             entity.LibelleAuto = false;
             entity.Session = 0;
             entity.TenantId = tenantId;
@@ -71,7 +72,7 @@ namespace DMS.EFCore.Repositories
             try
             {
                 await dbContext.Database.ExecuteSqlRawAsync(
-                    $"SET LOCAL app.tenant_id = '{tenantId}'");
+                    "SELECT set_config('app.tenant_id', {0}, true)", tenantId.ToString());
 
                 await dbContext.Database.ExecuteSqlRawAsync(
                     @"UPDATE dms_reference.""tn_Articles"" SET 
@@ -111,7 +112,7 @@ namespace DMS.EFCore.Repositories
             try
             {
                 await dbContext.Database.ExecuteSqlRawAsync(
-                    $"SET LOCAL app.tenant_id = '{tenantId}'");
+                    "SELECT set_config('app.tenant_id', {0}, true)", tenantId.ToString());
 
                 await dbContext.Database.ExecuteSqlRawAsync(
                     @"DELETE FROM dms_reference.""tn_Articles"" WHERE ""Code Article"" = {0}",

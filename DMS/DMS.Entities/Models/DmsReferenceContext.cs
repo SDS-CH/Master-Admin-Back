@@ -703,6 +703,8 @@ public partial class DmsReferenceContext : DbContext
 
     public virtual DbSet<TnCodesRegime> TnCodesRegimes { get; set; }
 
+    public virtual DbSet<TnCodesTaxis> TnCodesTaxes { get; set; }
+
     public virtual DbSet<TnCodesValidite> TnCodesValidites { get; set; }
 
     public virtual DbSet<TnColisagesDossier> TnColisagesDossiers { get; set; }
@@ -794,6 +796,8 @@ public partial class DmsReferenceContext : DbContext
     public virtual DbSet<TnDevisPackaging> TnDevisPackagings { get; set; }
 
     public virtual DbSet<TnDevise> TnDevises { get; set; }
+
+    public virtual DbSet<TnDevisesRef> TnDevisesRefs { get; set; }
 
     public virtual DbSet<TnDivision> TnDivisions { get; set; }
 
@@ -10050,6 +10054,56 @@ public partial class DmsReferenceContext : DbContext
                 .HasConstraintName("FK_tn_Codes_Regimes_tn_Rubriques_Operations");
         });
 
+        modelBuilder.Entity<TnCodesTaxis>(entity =>
+        {
+            entity.HasKey(e => new { e.CodeTaxe, e.TenantId }).HasName("tn_Codes_Taxes_pk");
+
+            entity.ToTable("tn_Codes_Taxes", "dms_reference");
+
+            entity.HasIndex(e => new { e.CodeTaxe, e.TenantId }, "uq_tn_Codes_Taxes_code_taxe_tenant").IsUnique();
+
+            entity.Property(e => e.CodeTaxe)
+                .HasMaxLength(10)
+                .HasColumnName("Code Taxe");
+            entity.Property(e => e.TenantId).HasColumnName("tenant_id");
+            entity.Property(e => e.Abbreviation)
+                .HasMaxLength(200)
+                .HasColumnName("abbreviation");
+            entity.Property(e => e.Agence).HasMaxLength(10);
+            entity.Property(e => e.CodeTisCompta).HasMaxLength(10);
+            entity.Property(e => e.CompteTaxeAchat)
+                .HasMaxLength(15)
+                .HasColumnName("Compte Taxe Achat");
+            entity.Property(e => e.CompteTaxeVente)
+                .HasMaxLength(15)
+                .HasColumnName("Compte Taxe Vente");
+            entity.Property(e => e.CountryId).HasColumnName("countryId");
+            entity.Property(e => e.DescriptionTaxe)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("Description Taxe");
+            entity.Property(e => e.PourcentageTaxe).HasColumnName("Pourcentage Taxe");
+            entity.Property(e => e.Rubrique).HasMaxLength(10);
+            entity.Property(e => e.TextPrefixOnNewLine).HasMaxLength(200);
+            entity.Property(e => e.TvaTaxTopology).HasMaxLength(50);
+            entity.Property(e => e.TypeTax).HasMaxLength(50);
+            entity.Property(e => e.WhTaxTopology).HasMaxLength(50);
+
+            entity.HasOne(d => d.AgenceNavigation).WithMany(p => p.TnCodesTaxes)
+                .HasForeignKey(d => d.Agence)
+                .HasConstraintName("tn_Codes_Taxes$tn_Agencestn_Codes_Taxes$Agence");
+
+            entity.HasOne(d => d.PcCompteComptable).WithMany(p => p.TnCodesTaxisPcCompteComptables)
+                .HasPrincipalKey(p => new { p.Compte, p.TenantId })
+                .HasForeignKey(d => new { d.CompteTaxeAchat, d.TenantId })
+                .HasConstraintName("tn_Codes_Taxes$PC_CompteComptable$Compte_Taxe_Achat");
+
+            entity.HasOne(d => d.PcCompteComptableNavigation).WithMany(p => p.TnCodesTaxisPcCompteComptableNavigations)
+                .HasPrincipalKey(p => new { p.Compte, p.TenantId })
+                .HasForeignKey(d => new { d.CompteTaxeVente, d.TenantId })
+                .HasConstraintName("tn_Codes_Taxes$PC_CompteComptable$Compte_Taxe_Vente");
+        });
+
         modelBuilder.Entity<TnCodesValidite>(entity =>
         {
             entity.HasKey(e => e.CodeValidite).HasName("tn_Codes_Validites_pk");
@@ -11821,6 +11875,22 @@ public partial class DmsReferenceContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("Libelle Devise");
             entity.Property(e => e.TenantId).HasColumnName("tenant_id");
+        });
+
+        modelBuilder.Entity<TnDevisesRef>(entity =>
+        {
+            entity.HasKey(e => e.Code).HasName("tn_devises_ref_pkey");
+
+            entity.ToTable("tn_Devises_ref", "dms_reference");
+
+            entity.Property(e => e.Code)
+                .HasMaxLength(3)
+                .IsFixedLength()
+                .HasColumnName("code");
+            entity.Property(e => e.Label)
+                .IsRequired()
+                .HasMaxLength(150)
+                .HasColumnName("label");
         });
 
         modelBuilder.Entity<TnDivision>(entity =>

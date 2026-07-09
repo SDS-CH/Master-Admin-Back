@@ -47,8 +47,8 @@ namespace Master.EFCore.Repositories
 
         public async Task<DataSourceResult> GetUsersByTenant(DataSourceRequest requestModel, int tenantId)
         {
-            var query = from u in dbContext.ErpUsers
-                        join ut in dbContext.ErpUserTenants on u.Id equals ut.UserId
+            var query = from ut in dbContext.ErpUserTenants
+                        join u in dbContext.ErpUsers on ut.UserId equals u.Id
                         where ut.TenantId == tenantId
                         select new ErpUserDTO
                         {
@@ -57,17 +57,16 @@ namespace Master.EFCore.Repositories
                             Email = u.Email,
                             FirstName = u.FirstName,
                             LastName = u.LastName,
-                            IsActive = u.IsActive,
-                            ResetPasswordIsNeeded = u.ResetPasswordIsNeeded,
-                            Photo = u.Photo,
-                            AddNewTime = u.AddNewTime,
-                            EditTime = u.EditTime,
-                            PasswordSalt = u.PasswordSalt,
-                            FailedLoginAttempts = u.FailedLoginAttempts,
-                            IsBlocked = u.IsBlocked,
-                            NumberOfAttemptsLogin = u.NumberOfAttemptsLogin,
-                            HasM2f = u.HasM2f,
-                            IsErpUser = ut.IsErpUser
+                            IsActive = ut.IsActive,         
+                            IsErpUser = ut.IsErpUser,       
+
+                            Tenants = dbContext.ErpUserTenants
+                                               .Where(t => t.UserId == u.Id)
+                                               .Select(t => new ErpUserTenantDTO
+                                               {
+                                                   TenantId = t.TenantId,
+                                                   IsActive = t.IsActive
+                                               }).ToList()
                         };
 
             return await query.ToDataSourceResultAsync(requestModel);

@@ -2,6 +2,7 @@
 using Kendo.Mvc.UI;
 using Master.DTO.DTOs;
 using Master.Infrastructure.IServices;
+using Master.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -33,8 +34,10 @@ namespace Master.API.Controllers
             => Ok(await _service.GetByEmail(email));
 
         [HttpPost("GetUsersByTenant")]
-        public async Task<IActionResult> GetUsersByTenant([DataSourceRequest] DataSourceRequest request, [FromQuery] int tenantId)
-            => Ok(await _service.GetUsersByTenant(request, tenantId));
+        public async Task<DataSourceResult> GetUsersByTenant([DataSourceRequest] DataSourceRequest request, [FromQuery] int tenantId)
+        {
+            return await _service.GetUsersByTenant(request, tenantId);
+        }
 
         [HttpPost("GetErpUsersByTenantSimple")]
         public async Task<IActionResult> GetErpUsersByTenantSimple([FromBody] ErpUserDTO dto)
@@ -76,9 +79,12 @@ namespace Master.API.Controllers
         public async Task<IActionResult> Deactivate(int tenantId, int userId)
             => Ok(await _service.DeactivateUserForTenant(userId, tenantId));
 
-        [HttpPost("Activate/{tenantId}")]
-        public async Task<IActionResult> Activate(int tenantId, [FromBody] ErpUserDTO dto)
-            => Ok(await _service.ActivateUserForTenant(dto, tenantId));
+        [HttpPost("Activate/{userId}")]
+        public async Task<IActionResult> Activate(int userId, [FromQuery] int tenantId) 
+        {
+            var result = await _service.ActivateUserForTenant(userId, tenantId);
+            return Ok(result);
+        }
 
         [HttpPost("SyncForTenant")]
         public IActionResult SyncForTenant([FromBody] object dto)

@@ -33,7 +33,8 @@ namespace Master.EFCore.Repositories
                             t.EntityName,
                             AddNewTime = t.AddNewTime.ToDateTime(TimeOnly.MinValue),
                             t.DbInstanceId,
-                            DbInstanceName = d != null ? d.ServerName : null
+                            DbInstanceName = d != null ? d.ServerName : null,
+                            DbName = d != null ? d.DbName : null,
                         };
 
             return await query.ToDataSourceResultAsync(requestModel);

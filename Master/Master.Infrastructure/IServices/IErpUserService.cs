@@ -21,6 +21,6 @@ namespace Master.Infrastructure.IServices
         Task<OperationResult> CreateUserForTenant(TEntityDTO entity, int tenantId);
         Task<OperationResult> CreateOrAttachUserForTenant(TEntityDTO entity, int tenantId);
         Task<OperationResult> DeactivateUserForTenant(int userId, int tenantId);
-        Task<OperationResult> ActivateUserForTenant(TEntityDTO entity, int tenantId);
+        Task<OperationResult> ActivateUserForTenant(int userId, int tenantId);
     }
 }

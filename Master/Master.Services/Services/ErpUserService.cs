@@ -7,6 +7,7 @@ using Master.DTO.DTOs;
 using Master.Entities.Models;
 using Master.Infrastructure.IRepositories;
 using Master.Infrastructure.IServices;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -91,7 +92,7 @@ namespace Master.Services.Services
             return await _userRepository.GetByUserName(email);
         }
 
-        public async Task<DataSourceResult> GetUsersByTenant(DataSourceRequest requestModel, int tenantId)
+        public async Task<DataSourceResult> GetUsersByTenant(DataSourceRequest requestModel, [FromBody] int tenantId)
         {
             return await _userRepository.GetUsersByTenant(requestModel, tenantId);
         }
@@ -187,19 +188,21 @@ namespace Master.Services.Services
             }
         }
 
-        public async Task<OperationResult> ActivateUserForTenant(TErpUserDTO entity, int tenantId)
+        public async Task<OperationResult> ActivateUserForTenant(int userId, int tenantId)
         {
             try
             {
                 var userTenant = await _dbContext.ErpUserTenants
-                    .FirstOrDefaultAsync(ut => ut.UserId == entity.Id && ut.TenantId == tenantId);
+                    .FirstOrDefaultAsync(ut => ut.UserId == userId && ut.TenantId == tenantId);
 
                 if (userTenant != null)
                 {
                     userTenant.IsActive = true;
                     await _dbContext.SaveChangesAsync();
+                    return new OperationResult(false, "User activated for tenant.");
                 }
-                return new OperationResult(false, "User activated for tenant.");
+
+                return new OperationResult(true, "User-tenant association not found.");
             }
             catch (Exception ex)
             {
